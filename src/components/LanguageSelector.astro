@@ -1,0 +1,471 @@
+---
+import { LOCALES_META, type Locale } from '../i18n/locales';
+import { getLanguageSwitcherLinks } from '../i18n/routes';
+
+interface Props {
+  currentLocale: Locale;
+  pageType: 'home' | 'tool' | 'page';
+  pageId: string;
+  label?: string;
+}
+
+const { currentLocale, pageType, pageId, label = 'Language' } = Astro.props;
+const links = getLanguageSwitcherLinks(pageType === 'tool' ? 'tool' : 'page', pageId);
+---
+
+<div class="lang-selector-wrapper">
+  <!-- Desktop Language Selector (visible ONLY on desktop >= 768px) -->
+  <label for="language-select" class="sr-only">{label}</label>
+  <div class="lang-select-box desktop-only">
+    <svg class="globe-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="10" />
+      <line x1="2" y1="12" x2="22" y2="12" />
+      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+    </svg>
+    <select
+      id="language-select"
+      class="lang-select"
+      aria-label={label}
+      onchange="window.location.href = this.value;"
+    >
+      {links.map((link) => (
+        <option
+          value={link.path}
+          selected={link.locale === currentLocale}
+        >
+          {LOCALES_META[link.locale].nativeName}
+        </option>
+      ))}
+    </select>
+    <svg class="chevron-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <polyline points="6 9 12 15 18 9" />
+    </svg>
+  </div>
+
+  <!-- Mobile Globe Trigger Button (visible ONLY on mobile < 768px) -->
+  <button
+    type="button"
+    class="mobile-lang-trigger mobile-only"
+    id="mobile-lang-trigger"
+    aria-label={label}
+    aria-haspopup="dialog"
+    aria-expanded="false"
+    aria-controls="mobile-lang-dialog"
+  >
+    <svg class="mobile-globe-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="10" />
+      <line x1="2" y1="12" x2="22" y2="12" />
+      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+    </svg>
+  </button>
+</div>
+
+<!-- Mobile Language Modal Backdrop & Bottom Sheet Dialog -->
+<div class="mobile-lang-backdrop" id="mobile-lang-backdrop" aria-hidden="true"></div>
+
+<div
+  class="mobile-lang-dialog"
+  id="mobile-lang-dialog"
+  role="dialog"
+  aria-modal="true"
+  aria-label={label}
+  aria-hidden="true"
+>
+  <div class="mobile-lang-header">
+    <div class="mobile-lang-title-group">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="10" />
+        <line x1="2" y1="12" x2="22" y2="12" />
+        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+      </svg>
+      <span class="mobile-lang-title">{label}</span>
+    </div>
+    <button
+      type="button"
+      class="mobile-lang-close-btn"
+      id="mobile-lang-close-btn"
+      aria-label="Close language selector"
+    >
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <line x1="18" y1="6" x2="6" y2="18" />
+        <line x1="6" y1="6" x2="18" y2="18" />
+      </svg>
+    </button>
+  </div>
+
+  <div class="mobile-lang-list" role="list">
+    {links.map((link) => {
+      const isCurrent = link.locale === currentLocale;
+      return (
+        <a
+          href={link.path}
+          class={`mobile-lang-item ${isCurrent ? 'is-active' : ''}`}
+          role="listitem"
+          aria-current={isCurrent ? 'true' : undefined}
+          lang={link.locale}
+          dir={link.locale === 'ar' ? 'rtl' : 'ltr'}
+        >
+          <span class="mobile-lang-item-name">{LOCALES_META[link.locale].nativeName}</span>
+          {isCurrent && (
+            <svg class="mobile-lang-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          )}
+        </a>
+      );
+    })}
+  </div>
+</div>
+
+<style>
+  .lang-selector-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  /* Desktop Select Box */
+  .lang-select-box {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    padding-inline-start: 0.5rem;
+    padding-inline-end: 0.4rem;
+    height: 38px;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+  }
+
+  .lang-select-box:hover {
+    border-color: var(--border-strong);
+    background-color: var(--bg-surface-hover);
+  }
+
+  .globe-icon {
+    color: var(--text-muted);
+    flex-shrink: 0;
+    pointer-events: none;
+    margin-inline-end: 0.25rem;
+  }
+
+  .chevron-icon {
+    color: var(--text-muted);
+    flex-shrink: 0;
+    pointer-events: none;
+    margin-inline-start: 0.2rem;
+  }
+
+  .lang-select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background: transparent;
+    border: none;
+    font-size: 0.84rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    cursor: pointer;
+    padding-block: 0.25rem;
+    outline: none;
+    max-width: 105px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .lang-select option {
+    background-color: var(--bg-app);
+    color: var(--text-primary);
+  }
+
+  /* Mobile Globe Button Trigger */
+  .mobile-lang-trigger {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-default);
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+    flex-shrink: 0;
+    padding: 0;
+  }
+
+  .mobile-lang-trigger:hover {
+    background-color: var(--bg-surface-hover);
+    border-color: var(--border-strong);
+  }
+
+  .mobile-globe-svg {
+    color: var(--text-primary);
+    pointer-events: none;
+  }
+
+  /* Mobile Backdrop */
+  .mobile-lang-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background-color: var(--bg-overlay);
+    backdrop-filter: blur(2px);
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .mobile-lang-backdrop.is-active {
+    display: block;
+    opacity: 1;
+  }
+
+  /* Mobile Dialog (Bottom Sheet on Mobile) */
+  .mobile-lang-dialog {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-width: 440px;
+    margin-inline: auto;
+    background-color: var(--bg-surface-elevated);
+    border: 1px solid var(--border-default);
+    border-bottom: none;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    z-index: 1001;
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.25);
+    flex-direction: column;
+    max-height: 80vh;
+    transform: translateY(100%);
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    overflow: hidden;
+  }
+
+  .mobile-lang-dialog.is-open {
+    display: flex;
+    transform: translateY(0);
+  }
+
+  .mobile-lang-header {
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-inline: 1.25rem;
+    border-bottom: 1px solid var(--border-subtle);
+    flex-shrink: 0;
+  }
+
+  .mobile-lang-title-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-primary);
+  }
+
+  .mobile-lang-title {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .mobile-lang-close-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-subtle);
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+  }
+
+  .mobile-lang-close-btn:hover {
+    background-color: var(--bg-surface-hover);
+  }
+
+  .mobile-lang-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.5rem 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mobile-lang-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    min-height: 46px;
+    border-radius: var(--radius-md);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    text-decoration: none;
+    background-color: transparent;
+    border: 1px solid transparent;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+  }
+
+  .mobile-lang-item:hover {
+    background-color: var(--bg-surface-hover);
+    border-color: var(--border-subtle);
+  }
+
+  .mobile-lang-item.is-active {
+    background-color: var(--bg-surface);
+    border-color: var(--border-default);
+    font-weight: 700;
+  }
+
+  .mobile-lang-item-name {
+    flex: 1;
+  }
+
+  .mobile-lang-check {
+    color: var(--text-primary);
+    flex-shrink: 0;
+    margin-inline-start: 0.5rem;
+  }
+
+  /* Responsive Switching: Desktop vs Mobile */
+  @media (max-width: 767px) {
+    .desktop-only {
+      display: none !important;
+    }
+
+    .mobile-only {
+      display: inline-flex !important;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .mobile-only {
+      display: none !important;
+    }
+
+    .mobile-lang-backdrop,
+    .mobile-lang-dialog {
+      display: none !important;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .mobile-lang-trigger {
+      width: 36px;
+      height: 36px;
+    }
+  }
+
+  @media (max-width: 360px) {
+    .mobile-lang-header {
+      padding-inline: 1rem;
+    }
+    .mobile-lang-list {
+      padding-inline: 0.5rem;
+    }
+    .mobile-lang-item {
+      padding: 0.625rem 0.75rem;
+      font-size: 0.875rem;
+    }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    const trigger = document.getElementById('mobile-lang-trigger');
+    const closeBtn = document.getElementById('mobile-lang-close-btn');
+    const dialog = document.getElementById('mobile-lang-dialog');
+    const backdrop = document.getElementById('mobile-lang-backdrop');
+    if (!trigger || !dialog || !backdrop) return;
+
+    function openDialog() {
+      // If mobile hamburger drawer is open, close it first
+      const drawerCloseBtn = document.getElementById('drawer-close-btn');
+      const drawer = document.getElementById('mobile-drawer');
+      if (drawer && drawer.classList.contains('is-open') && drawerCloseBtn) {
+        drawerCloseBtn.click();
+      }
+
+      trigger.setAttribute('aria-expanded', 'true');
+      trigger.setAttribute('aria-label', 'Close language selector');
+      dialog.classList.add('is-open');
+      dialog.setAttribute('aria-hidden', 'false');
+      backdrop.classList.add('is-active');
+      backdrop.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('lang-dialog-open');
+      if (closeBtn) closeBtn.focus();
+    }
+
+    function closeDialog() {
+      trigger.setAttribute('aria-expanded', 'false');
+      trigger.setAttribute('aria-label', trigger.dataset.label || 'Select language');
+      dialog.classList.remove('is-open');
+      dialog.setAttribute('aria-hidden', 'true');
+      backdrop.classList.remove('is-active');
+      backdrop.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('lang-dialog-open');
+      trigger.focus();
+    }
+
+    function toggleDialog() {
+      const isOpen = trigger.getAttribute('aria-expanded') === 'true';
+      if (isOpen) {
+        closeDialog();
+      } else {
+        openDialog();
+      }
+    }
+
+    trigger.addEventListener('click', toggleDialog);
+    if (closeBtn) closeBtn.addEventListener('click', closeDialog);
+    backdrop.addEventListener('click', closeDialog);
+
+    // Close on option click
+    const options = dialog.querySelectorAll('.mobile-lang-item');
+    options.forEach(function (opt) {
+      opt.addEventListener('click', function () {
+        closeDialog();
+      });
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && trigger.getAttribute('aria-expanded') === 'true') {
+        closeDialog();
+      }
+    });
+
+    // Close on window resize to desktop
+    window.addEventListener('resize', function () {
+      if (window.innerWidth >= 768 && trigger.getAttribute('aria-expanded') === 'true') {
+        closeDialog();
+      }
+    });
+  })();
+</script>

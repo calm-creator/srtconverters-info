@@ -1,0 +1,214 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SEOHead from '../components/SEOHead.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { DEFAULT_LOCALE } from '../i18n/locales';
+import { getPagePath, getHomePath } from '../i18n/routes';
+import { getUi } from '../i18n/ui';
+
+const locale = DEFAULT_LOCALE;
+const ui = getUi(locale);
+const homePath = getHomePath(locale);
+const toolsPath = getPagePath('tools', locale);
+
+const breadcrumbs = [
+  { name: ui.breadcrumbs.home, path: homePath },
+  { name: ui.notFound.badge, path: '#' },
+];
+
+const pageTitle = `${ui.notFound.title} (404) – ${ui.siteName}`;
+const pageDescription = ui.notFound.description;
+---
+
+<BaseLayout locale={locale} pageType="page" pageId="home">
+  <SEOHead
+    slot="head"
+    title={pageTitle}
+    description={pageDescription}
+    locale={locale}
+    canonicalPath={homePath}
+    pageType="page"
+    pageId="home"
+    breadcrumbs={breadcrumbs}
+  />
+  <meta slot="head" name="robots" content="noindex, nofollow" />
+
+  <div class="container not-found-container">
+    <Breadcrumbs crumbs={breadcrumbs} />
+
+    <div class="not-found-card">
+      <div class="not-found-badge-wrap">
+        <span class="badge badge-404">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <span>{ui.notFound.badge}</span>
+        </span>
+      </div>
+
+      <h1 class="not-found-title">{ui.notFound.title}</h1>
+      <p class="not-found-desc">{ui.notFound.description}</p>
+
+      <div class="not-found-actions">
+        <a href={homePath} class="btn btn-primary btn-lg">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+          <span>{ui.notFound.backHome}</span>
+        </a>
+
+        <a href={toolsPath} class="btn btn-secondary btn-lg">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+          </svg>
+          <span>{ui.notFound.viewTools}</span>
+        </a>
+      </div>
+
+      <div class="not-found-suggestions">
+        <p class="suggestions-heading">Available Subtitle Converters:</p>
+        <ul class="suggestions-list">
+          <li>
+            <a href={getPagePath('tools', locale)} class="suggestion-link">
+              <strong>SRT to TXT:</strong> Strip timestamps and extract plain text
+            </a>
+          </li>
+          <li>
+            <a href={getPagePath('tools', locale)} class="suggestion-link">
+              <strong>TXT to SRT:</strong> Convert text and transcripts to timed subtitles
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .not-found-container {
+    padding-block: 2rem 5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .not-found-card {
+    width: 100%;
+    max-width: 640px;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    padding: 3rem 2rem;
+    text-align: center;
+    margin-top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .not-found-badge-wrap {
+    margin-bottom: 1.25rem;
+  }
+
+  .badge-404 {
+    font-size: 0.8125rem;
+    padding: 0.35rem 0.875rem;
+    gap: 0.4rem;
+  }
+
+  .not-found-title {
+    font-size: clamp(2rem, 4vw, 2.75rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+    margin: 0 0 1rem;
+    line-height: 1.2;
+  }
+
+  .not-found-desc {
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin: 0 0 2rem;
+    max-width: 480px;
+  }
+
+  .not-found-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 2.5rem;
+  }
+
+  .not-found-suggestions {
+    width: 100%;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-subtle);
+    text-align: start;
+  }
+
+  .suggestions-heading {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin: 0 0 0.75rem;
+  }
+
+  .suggestions-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .suggestion-link {
+    display: block;
+    padding: 0.625rem 0.875rem;
+    background-color: var(--bg-surface-elevated);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  }
+
+  .suggestion-link strong {
+    color: var(--text-primary);
+  }
+
+  .suggestion-link:hover {
+    background-color: var(--bg-surface-hover);
+    border-color: var(--border-default);
+    color: var(--text-primary);
+  }
+
+  @media (max-width: 640px) {
+    .not-found-container {
+      padding-block: 1.5rem 3.5rem;
+    }
+
+    .not-found-card {
+      padding: 2rem 1.25rem;
+    }
+
+    .not-found-actions {
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .not-found-actions .btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+</style>

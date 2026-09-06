@@ -1,0 +1,285 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SEOHead from '../components/SEOHead.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { DEFAULT_LOCALE } from '../i18n/locales';
+import { getPagePath, getHomePath } from '../i18n/routes';
+import { getUi } from '../i18n/ui';
+
+const locale = DEFAULT_LOCALE;
+const ui = getUi(locale);
+const canonicalPath = getPagePath('about', locale);
+const homePath = getHomePath(locale);
+const toolsPath = getPagePath('tools', locale);
+const contactPath = getPagePath('contact', locale);
+
+const breadcrumbs = [
+  { name: ui.breadcrumbs.home, path: homePath },
+  { name: ui.nav.about, path: canonicalPath },
+];
+
+const pageTitle = `${ui.nav.about} – ${ui.siteName}`;
+const pageDescription = 'Learn about srtconverters.info, our mission to provide fast, 100% private in-browser subtitle tools, and our engineering principles.';
+---
+
+<BaseLayout locale={locale} pageType="page" pageId="about">
+  <SEOHead
+    slot="head"
+    title={pageTitle}
+    description={pageDescription}
+    locale={locale}
+    canonicalPath={canonicalPath}
+    pageType="page"
+    pageId="about"
+    breadcrumbs={breadcrumbs}
+  />
+
+  <div class="content-container page-content-container">
+    <Breadcrumbs crumbs={breadcrumbs} />
+
+    <header class="page-header">
+      <div class="header-badge-wrap">
+        <span class="badge">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="16" x2="12" y2="12"/>
+            <line x1="12" y1="8" x2="12.01" y2="8"/>
+          </svg>
+          <span>Genuine, Browser-First Utility</span>
+        </span>
+      </div>
+      <h1 class="page-title">{ui.nav.about}</h1>
+      <p class="page-subtitle">The mission, purpose, and technology behind srtconverters.info.</p>
+    </header>
+
+    <article class="prose">
+      <section class="prose-section">
+        <h2>What is srtconverters.info?</h2>
+        <p>
+          <strong>srtconverters.info</strong> is an independent web platform created specifically to make subtitle and caption conversion simple, fast, and private.
+        </p>
+        <p>
+          Whether you are a video editor synchronizing dialogue tracks, a content creator formatting captions for social media, a translator working with multilingual scripts, an educator publishing course materials, or a developer dealing with SubRip formats, our tools are built to handle file conversions cleanly and instantly.
+        </p>
+      </section>
+
+      <section class="prose-section">
+        <h2>The Problem We Set Out to Solve</h2>
+        <p>
+          Anyone who has regularly dealt with video subtitles has likely encountered common frustrations with existing online file converters:
+        </p>
+        <ul>
+          <li><strong>Forced File Uploads:</strong> Many converters require uploading your unpublished scripts, sensitive corporate interviews, or personal audio transcripts to remote third-party servers.</li>
+          <li><strong>Artificial Barriers:</strong> Countless conversion websites hide basic features behind account registrations, email submissions, paywalls, or strict file size limitations.</li>
+          <li><strong>Bloated Software:</strong> Downloading and configuring bulky desktop applications just to strip subtitle timecodes or convert text into SRT format is often cumbersome and unnecessary.</li>
+          <li><strong>Cluttered Interfaces:</strong> Slow-loading pages filled with misleading download buttons, intrusive popups, and complex settings detract from getting the job done.</li>
+        </ul>
+        <p>
+          We created <strong>srtconverters.info</strong> as a clean, reliable alternative: dedicated single-purpose subtitle utilities that perform format conversions immediately right inside your browser, with zero friction.
+        </p>
+      </section>
+
+      <section class="prose-section">
+        <h2>Our Tooling & Purpose</h2>
+        <p>
+          Rather than building a complex, bloated suite, we focus on perfecting essential subtitle utilities:
+        </p>
+        <div class="tools-feature-grid">
+          <div class="tool-feature-card">
+            <div class="card-icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+              </svg>
+            </div>
+            <h3 class="card-title">SRT to TXT Converter</h3>
+            <p class="card-desc">
+              Strips subtitle cue numbers and millisecond timestamp markers to deliver clean, readable text ready for study notes, blog posts, translations, or video descriptions.
+            </p>
+          </div>
+
+          <div class="tool-feature-card">
+            <div class="card-icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+            </div>
+            <h3 class="card-title">TXT to SRT Converter</h3>
+            <p class="card-desc">
+              Transforms raw dialogue, transcripts, or video scripts into standard, numbered SubRip (.srt) files with progressive timestamps and configurable cue durations.
+            </p>
+          </div>
+        </div>
+        <p>
+          Explore all currently available utilities on our dedicated <a href={toolsPath}>Tools page</a>.
+        </p>
+      </section>
+
+      <section class="prose-section">
+        <h2>Why Browser-Based Processing Matters</h2>
+        <p>
+          The defining technical principle of srtconverters.info is <strong>100% client-side execution</strong>:
+        </p>
+        <ul>
+          <li><strong>True Data Privacy:</strong> When you open a file or paste text into our converters, the data is processed directly inside your browser memory using HTML5 Web APIs. Your content is never transmitted across the internet to our servers or any cloud database.</li>
+          <li><strong>Instant Execution:</strong> Without network upload or download latency, conversions occur instantaneously in milliseconds, even for files containing thousands of subtitle cues.</li>
+          <li><strong>Offline Usability:</strong> Once the page is loaded, the conversion logic can run without an active internet connection.</li>
+        </ul>
+      </section>
+
+      <section class="prose-section">
+        <h2>Our Core Commitments</h2>
+        <h3>1. Privacy by Design</h3>
+        <p>
+          We believe user privacy should not depend on vague promises. By designing our architecture so that files never touch our servers, privacy is mathematically guaranteed by the client-side code itself.
+        </p>
+
+        <h3>2. Thoughtful, Accessible Design</h3>
+        <p>
+          We follow a focused, high-contrast monochrome design system (Black & White) with complete Dark Mode and Light Mode support. Every page and component is engineered to be fully responsive, lightweight, and accessible on smartphones, tablets, and desktop displays.
+        </p>
+
+        <h3>3. Universal Multilingual Support</h3>
+        <p>
+          Subtitles are global by nature. Our parsing algorithms provide full UTF-8 Unicode decoding, preserving accented Latin scripts, right-to-left Arabic, Hindi Devanagari, Japanese, Korean, Vietnamese, and other international character sets without text corruption.
+        </p>
+
+        <h3>4. Ongoing Quality & Standards Compliance</h3>
+        <p>
+          We continuously test our tools against official SubRip syntax standards to ensure generated subtitle files load reliably in major media players (such as VLC) and video editing platforms (including YouTube Studio, Premiere Pro, DaVinci Resolve, and Final Cut Pro).
+        </p>
+      </section>
+
+      <section class="prose-section">
+        <h2>Get in Touch</h2>
+        <p>
+          We are committed to continually improving srtconverters.info. If you have questions, encounter an edge-case subtitle format that doesn&rsquo;t convert as expected, or would like to suggest a new tool, please visit our <a href={contactPath}>Contact page</a>. We value user feedback and actively incorporate community suggestions.
+        </p>
+      </section>
+    </article>
+  </div>
+</BaseLayout>
+
+<style>
+  .page-content-container {
+    padding-block: 2rem 5rem;
+    max-width: 820px;
+  }
+
+  .page-header {
+    margin-block-end: 2rem;
+  }
+
+  .header-badge-wrap {
+    margin-bottom: 0.75rem;
+  }
+
+  .page-title {
+    font-size: clamp(2rem, 4vw, 2.5rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.35rem;
+  }
+
+  .page-subtitle {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  .prose-section {
+    margin-block-end: 2.5rem;
+  }
+
+  .prose-section h2 {
+    font-size: 1.375rem;
+    font-weight: 700;
+    margin-block-end: 0.875rem;
+    letter-spacing: -0.01em;
+    color: var(--text-primary);
+  }
+
+  .prose-section h3 {
+    font-size: 1.0625rem;
+    font-weight: 600;
+    margin-block: 1.25rem 0.5rem;
+    color: var(--text-primary);
+  }
+
+  .prose-section p {
+    font-size: 0.96875rem;
+    line-height: 1.7;
+    margin-block-end: 0.875rem;
+    color: var(--text-secondary);
+  }
+
+  .prose-section ul {
+    margin-inline-start: 1.5rem;
+    margin-block-end: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.96875rem;
+    line-height: 1.65;
+    color: var(--text-secondary);
+  }
+
+  .prose-section li strong {
+    color: var(--text-primary);
+  }
+
+  .prose-section a {
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+
+  .tools-feature-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    margin-block: 1.25rem 1.5rem;
+  }
+
+  .tool-feature-card {
+    padding: 1.25rem;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .card-icon {
+    color: var(--text-primary);
+    display: flex;
+  }
+
+  .card-title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-primary);
+  }
+
+  .card-desc {
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  @media (max-width: 640px) {
+    .page-content-container {
+      padding-block: 1.5rem 3.5rem;
+    }
+
+    .tools-feature-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+  }
+</style>

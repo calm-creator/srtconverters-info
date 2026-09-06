@@ -1,0 +1,1452 @@
+---
+import type { ToolDetailContent } from '../../data/tools/srt-to-txt';
+
+interface Props {
+  content: ToolDetailContent;
+  locale: string;
+}
+
+const { content, locale } = Astro.props;
+const ui = content.ui;
+---
+
+<div class="converter-card" id="converter-root" data-locale={locale}>
+  <!-- Input Section -->
+  <div class="input-section" id="input-section">
+    <!-- Top 2-Column Editor Grid (Desktop: 2 Columns / Mobile: Stacked) -->
+    <div class="editor-grid">
+      <!-- Left: SRT Input (.srt) -->
+      <div class="editor-pane srt-input-pane">
+        <div class="pane-header">
+          <div class="pane-title-group">
+            <svg class="pane-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+              <polyline points="14 2 14 8 20 8"/>
+            </svg>
+            <label for="srt-paste-input" class="pane-title">{ui.pasteTitle}</label>
+          </div>
+          <div class="pane-actions">
+            <button
+              type="button"
+              class="btn-pane-action"
+              id="btn-sample"
+              aria-label={ui.trySampleButton}
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polygon points="5 3 19 12 5 21 5 3"/>
+              </svg>
+              <span>{ui.trySampleButton}</span>
+            </button>
+            <button
+              type="button"
+              class="btn-pane-action"
+              id="btn-clear-paste"
+              aria-label={ui.clearButton}
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+              <span>{ui.clearButton}</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="pane-body">
+          <textarea
+            id="srt-paste-input"
+            class="editor-textarea"
+            placeholder={ui.pastePlaceholder}
+            aria-label={ui.pasteTitle}
+            rows="10"
+            spellcheck="false"
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- Right: Clean Plain Text Preview (.txt) -->
+      <div class="editor-pane srt-preview-pane">
+        <div class="pane-header">
+          <div class="pane-title-group">
+            <svg class="pane-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="4 17 10 11 4 5" />
+              <line x1="12" y1="19" x2="20" y2="19" />
+            </svg>
+            <span class="pane-title">{ui.livePreviewTitle}</span>
+          </div>
+          <div class="pane-actions">
+            <button
+              type="button"
+              class="btn-pane-action"
+              id="btn-copy-live"
+              aria-label={ui.copyAction}
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+                <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+              </svg>
+              <span id="copy-live-text">{ui.copyAction}</span>
+            </button>
+            <button
+              type="button"
+              class="btn-pane-action btn-pane-primary"
+              id="btn-download-live"
+              aria-label={ui.downloadAction}
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              <span>{ui.downloadAction}</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="pane-body">
+          <textarea
+            id="srt-live-preview"
+            class="editor-textarea preview-textarea"
+            readonly
+            placeholder={ui.previewEmpty}
+            aria-label={ui.livePreviewTitle}
+            rows="10"
+            spellcheck="false"
+          ></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- OR Divider (Completely Unchanged) -->
+    <div class="or-divider" aria-hidden="true">
+      <span class="or-line"></span>
+      <span class="or-badge">{ui.orDivider}</span>
+      <span class="or-line"></span>
+    </div>
+
+    <!-- Option 2: Upload SRT File (Browse/Upload SRT File Box Completely Unchanged) -->
+    <div class="option-block option-upload">
+      <div class="option-header">
+        <div class="option-title-group">
+          <span class="option-badge">2</span>
+          <span class="option-title">{ui.uploadTitle}</span>
+        </div>
+      </div>
+
+      <div
+        class="dropzone"
+        id="dropzone"
+        role="region"
+        aria-label={ui.dropzoneTitle}
+        tabindex="0"
+      >
+        <!-- Default Dropzone View -->
+        <div class="dropzone-inner" id="dropzone-default-view">
+          <div class="dropzone-icon" aria-hidden="true">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="17 8 12 3 7 8" />
+              <line x1="12" y1="3" x2="12" y2="15" />
+            </svg>
+          </div>
+
+          <p class="dropzone-title" id="dropzone-text">{ui.dropzoneTitle}</p>
+          <p class="dropzone-sub">{ui.dropzoneSubtitle}</p>
+
+          <button type="button" class="btn btn-secondary btn-browse" id="btn-browse">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/>
+            </svg>
+            <span>{ui.browseButton}</span>
+          </button>
+        </div>
+
+        <!-- File Attached View -->
+        <div class="file-attached-view" id="file-attached-view" style="display: none;">
+          <div class="attached-file-info">
+            <div class="attached-file-icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                <polyline points="14 2 14 8 20 8"/>
+              </svg>
+            </div>
+            <div class="attached-file-meta">
+              <span class="attached-file-name" id="attached-filename">-</span>
+              <span class="attached-file-size" id="attached-filesize">-</span>
+            </div>
+          </div>
+          <button type="button" class="btn-remove-file" id="btn-remove-file" aria-label="Remove attached file">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+
+        <input
+          type="file"
+          id="file-input"
+          accept=".srt,text/plain"
+          class="sr-only"
+          aria-label={ui.browseButton}
+        />
+      </div>
+    </div>
+
+    <!-- Conversion Options Bar -->
+    <div class="options-bar">
+      <span class="options-heading">{ui.optionsTitle}:</span>
+      <div class="options-group">
+        <label class="option-check">
+          <input type="checkbox" id="opt-empty-line" checked />
+          <span>{ui.optEmptyLine}</span>
+        </label>
+        <label class="option-check">
+          <input type="checkbox" id="opt-strip-tags" checked />
+          <span>{ui.optRemoveTags}</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Convert Action Button -->
+    <div class="convert-action-wrap">
+      <button type="button" class="btn btn-primary btn-lg btn-convert" id="btn-convert">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="m9 18 6-6-6-6"/>
+        </svg>
+        <span>{ui.convertButton}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Error Alert -->
+  <div class="alert-error" id="error-box" role="alert" style="display: none;">
+    <svg class="alert-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="10" />
+      <line x1="12" y1="8" x2="12" y2="12" />
+      <line x1="12" y1="16" x2="12.01" y2="16" />
+    </svg>
+    <span id="error-message"></span>
+  </div>
+
+  <!-- File Info & Options (Shown after conversion) -->
+  <div class="processing-panel" id="processing-panel" style="display: none;">
+    <div class="file-summary">
+      <div class="summary-item">
+        <span class="summary-label">{ui.fileNameLabel}</span>
+        <span class="summary-value" id="summary-filename">-</span>
+      </div>
+      <div class="summary-item">
+        <span class="summary-label">{ui.fileSizeLabel}</span>
+        <span class="summary-value" id="summary-filesize">-</span>
+      </div>
+      <div class="summary-item">
+        <span class="summary-label">{ui.cueCountLabel}</span>
+        <span class="summary-value" id="summary-cues">-</span>
+      </div>
+      <div class="summary-item">
+        <span class="summary-label">{ui.characterCountLabel}</span>
+        <span class="summary-value" id="summary-chars">-</span>
+      </div>
+    </div>
+
+    <!-- Conversion Options on Results -->
+    <div class="options-bar">
+      <label class="option-check">
+        <input type="checkbox" id="opt-empty-line-results" checked />
+        <span>{ui.optEmptyLine}</span>
+      </label>
+      <label class="option-check">
+        <input type="checkbox" id="opt-strip-tags-results" checked />
+        <span>{ui.optRemoveTags}</span>
+      </label>
+    </div>
+
+    <!-- Actions Bar -->
+    <div class="actions-bar">
+      <div class="actions-primary">
+        <button type="button" class="btn btn-primary btn-lg action-btn" id="btn-download">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+          <span>{ui.downloadAction}</span>
+        </button>
+
+        <button type="button" class="btn btn-secondary btn-lg action-btn" id="btn-copy">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+            <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+          </svg>
+          <span id="copy-btn-text">{ui.copyAction}</span>
+        </button>
+      </div>
+
+      <button type="button" class="btn btn-secondary action-btn-reset" id="btn-reset">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+          <path d="M21 3v5h-5" />
+          <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+          <path d="M8 16H3v5" />
+        </svg>
+        <span>{ui.resetAction}</span>
+      </button>
+    </div>
+
+    <!-- Preview Box -->
+    <div class="preview-card">
+      <div class="preview-header">
+        <span class="preview-title">{ui.previewTitle}</span>
+      </div>
+      <textarea
+        id="preview-text"
+        class="preview-content"
+        readonly
+        rows="9"
+        aria-label={ui.previewTitle}
+      ></textarea>
+    </div>
+  </div>
+</div>
+
+<style>
+  .converter-card {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    padding: 1.75rem;
+    margin-block-end: 3rem;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .input-section {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  /* 2-Column Editor Grid (Desktop: 2 cols, Mobile: stacked) */
+  .editor-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    width: 100%;
+  }
+
+  .editor-pane {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .pane-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.625rem;
+    min-height: 32px;
+  }
+
+  .pane-title-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+  }
+
+  .pane-icon {
+    color: var(--text-primary);
+    flex-shrink: 0;
+  }
+
+  .pane-title {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .pane-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    flex-shrink: 0;
+  }
+
+  .btn-pane-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.25rem 0.625rem;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    background-color: var(--bg-surface-elevated);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    white-space: nowrap;
+    user-select: none;
+  }
+
+  .btn-pane-action:hover {
+    background-color: var(--bg-surface-hover);
+    border-color: var(--border-strong);
+  }
+
+  .btn-pane-primary {
+    background-color: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    border-color: var(--btn-primary-bg);
+  }
+
+  .btn-pane-primary:hover {
+    background-color: var(--btn-primary-hover);
+    border-color: var(--btn-primary-hover);
+    color: var(--btn-primary-text);
+  }
+
+  .pane-body {
+    width: 100%;
+  }
+
+  /* Monospace Editor & Preview Textarea */
+  .editor-textarea {
+    width: 100%;
+    height: 260px;
+    min-height: 200px;
+    max-height: 480px;
+    padding: 0.875rem 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--text-primary);
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    box-sizing: border-box;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .editor-textarea:focus {
+    border-color: var(--border-focus);
+    box-shadow: var(--focus-ring);
+  }
+
+  .editor-textarea::placeholder {
+    color: var(--text-muted);
+    opacity: 0.8;
+  }
+
+  .preview-textarea {
+    background-color: var(--bg-surface-elevated);
+  }
+
+  /* OR Divider */
+  .or-divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 1.75rem 0;
+    user-select: none;
+  }
+
+  .or-line {
+    flex: 1;
+    height: 1px;
+    background-color: var(--border-subtle);
+  }
+
+  .or-badge {
+    padding: 0.2rem 0.75rem;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--border-default);
+    background-color: var(--bg-surface-elevated);
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  /* Option 2: Upload Block */
+  .option-block {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .option-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.625rem;
+  }
+
+  .option-title-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .option-badge {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background-color: var(--text-primary);
+    color: var(--bg-app);
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .option-title {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
+  }
+
+  /* Dropzone (Secondary Option) */
+  .dropzone {
+    border: 2px dashed var(--border-strong);
+    border-radius: var(--radius-md);
+    padding: 1.75rem 1.25rem;
+    text-align: center;
+    background-color: var(--bg-surface-elevated);
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+
+  .dropzone:hover,
+  .dropzone.dragover {
+    border-color: var(--border-focus);
+    background-color: var(--bg-surface-hover);
+  }
+
+  .dropzone-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .dropzone-icon {
+    color: var(--text-primary);
+  }
+
+  .dropzone-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  .dropzone-sub {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    margin: 0;
+  }
+
+  .btn-browse {
+    margin-top: 0.35rem;
+    font-size: 0.84rem;
+    padding: 0.4rem 0.875rem;
+  }
+
+  /* File Attached View inside Dropzone */
+  .file-attached-view {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0.75rem;
+    background-color: var(--bg-surface-hover);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    gap: 0.75rem;
+  }
+
+  .attached-file-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 0;
+    text-align: start;
+  }
+
+  .attached-file-icon {
+    color: var(--text-primary);
+    flex-shrink: 0;
+  }
+
+  .attached-file-meta {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .attached-file-name {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .attached-file-size {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  .btn-remove-file {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-subtle);
+    background-color: var(--bg-surface);
+    color: var(--text-muted);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+  }
+
+  .btn-remove-file:hover {
+    color: var(--text-primary);
+    border-color: var(--border-strong);
+    background-color: var(--bg-surface-hover);
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  /* Options Bar */
+  .options-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    margin-top: 1.25rem;
+    background-color: var(--bg-surface-elevated);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+  }
+
+  .options-heading {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .options-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+  }
+
+  .option-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    user-select: none;
+    line-height: 1.4;
+  }
+
+  .option-check input[type="checkbox"] {
+    accent-color: var(--accent-contrast);
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  /* Convert Action Button */
+  .convert-action-wrap {
+    margin-top: 1.25rem;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .btn-convert {
+    width: 100%;
+    max-width: 320px;
+    height: 48px;
+    font-size: 1rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: background-color 0.15s ease, transform 0.1s ease;
+  }
+
+  .btn-convert:active {
+    transform: translateY(1px);
+  }
+
+  /* Alert Error */
+  .alert-error {
+    margin-top: 1.25rem;
+    padding: 0.875rem 1.25rem;
+    border-radius: var(--radius-md);
+    background-color: var(--bg-surface-hover);
+    border: 1px solid var(--border-strong);
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.9375rem;
+    word-break: break-word;
+  }
+
+  .alert-icon {
+    flex-shrink: 0;
+  }
+
+  /* Processing Panel */
+  .processing-panel {
+    margin-top: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    width: 100%;
+  }
+
+  .file-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0.75rem;
+    width: 100%;
+  }
+
+  .summary-item {
+    background-color: var(--bg-surface-elevated);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 0.75rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+  }
+
+  .summary-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .summary-value {
+    font-family: var(--font-mono);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Actions Bar */
+  .actions-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    width: 100%;
+  }
+
+  .actions-primary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  /* Preview Card */
+  .preview-card {
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    background-color: var(--bg-surface-elevated);
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .preview-header {
+    padding: 0.625rem 1rem;
+    background-color: var(--bg-surface-hover);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .preview-title {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .preview-content {
+    width: 100%;
+    border: none;
+    padding: 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--text-primary);
+    background-color: var(--bg-input);
+    resize: vertical;
+    outline: none;
+    box-sizing: border-box;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* ==========================================================================
+     MOBILE RESPONSIVENESS (< 768px)
+     ========================================================================== */
+  @media (max-width: 767px) {
+    .editor-grid {
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+    }
+
+    .editor-textarea {
+      height: 200px;
+      min-height: 160px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .converter-card {
+      padding: 1.25rem 0.875rem;
+      margin-block-end: 2rem;
+    }
+
+    .pane-header {
+      gap: 0.375rem;
+    }
+
+    .pane-title {
+      font-size: 0.875rem;
+    }
+
+    .btn-pane-action {
+      padding: 0.2rem 0.5rem;
+      font-size: 0.75rem;
+    }
+
+    .editor-textarea {
+      font-size: 0.8125rem;
+      padding: 0.75rem;
+    }
+
+    .dropzone {
+      padding: 1.5rem 0.875rem;
+    }
+
+    .dropzone-title {
+      font-size: 0.9375rem;
+    }
+
+    .dropzone-sub {
+      font-size: 0.78rem;
+    }
+
+    .btn-browse {
+      width: 100%;
+    }
+
+    .btn-convert {
+      max-width: 100%;
+      height: 48px;
+    }
+
+    .file-summary {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.5rem;
+    }
+
+    .summary-item {
+      padding: 0.625rem 0.75rem;
+    }
+
+    .summary-value {
+      font-size: 0.875rem;
+    }
+
+    .options-bar {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.625rem;
+      padding: 0.75rem 0.875rem;
+    }
+
+    .options-group {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .actions-bar {
+      flex-direction: column;
+      width: 100%;
+      gap: 0.75rem;
+    }
+
+    .actions-primary {
+      flex-direction: column;
+      width: 100%;
+      gap: 0.625rem;
+    }
+
+    .action-btn,
+    .action-btn-reset {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .preview-content {
+      font-size: 0.8125rem;
+      padding: 0.75rem;
+    }
+  }
+
+  @media (max-width: 360px) {
+    .converter-card {
+      padding: 1rem 0.625rem;
+    }
+
+    .dropzone {
+      padding: 1.25rem 0.5rem;
+    }
+
+    .file-summary {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script is:inline define:vars={{
+  errInvalid: ui.errorInvalidFile,
+  errEmpty: ui.errorEmptyFile,
+  errParse: ui.errorParseFailed,
+  errNoInput: ui.errorNoInput,
+  pastedContentSource: ui.pastedContentSource,
+  copiedSuccess: ui.copiedSuccess,
+  originalCopyText: ui.copyAction,
+  previewEmptyText: ui.previewEmpty,
+}}>
+  (function () {
+    const inputSection = document.getElementById('input-section');
+    const pasteInput = document.getElementById('srt-paste-input');
+    const livePreview = document.getElementById('srt-live-preview');
+    const btnSample = document.getElementById('btn-sample');
+    const btnClearPaste = document.getElementById('btn-clear-paste');
+    const btnCopyLive = document.getElementById('btn-copy-live');
+    const copyLiveText = document.getElementById('copy-live-text');
+    const btnDownloadLive = document.getElementById('btn-download-live');
+
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('file-input');
+    const btnBrowse = document.getElementById('btn-browse');
+    const dropzoneDefaultView = document.getElementById('dropzone-default-view');
+    const fileAttachedView = document.getElementById('file-attached-view');
+    const attachedFilename = document.getElementById('attached-filename');
+    const attachedFilesize = document.getElementById('attached-filesize');
+    const btnRemoveFile = document.getElementById('btn-remove-file');
+    const btnConvert = document.getElementById('btn-convert');
+
+    const errorBox = document.getElementById('error-box');
+    const errorMessage = document.getElementById('error-message');
+    const processingPanel = document.getElementById('processing-panel');
+    const previewText = document.getElementById('preview-text');
+    const btnDownload = document.getElementById('btn-download');
+    const btnCopy = document.getElementById('btn-copy');
+    const copyBtnText = document.getElementById('copy-btn-text');
+    const btnReset = document.getElementById('btn-reset');
+
+    const optEmptyLine = document.getElementById('opt-empty-line');
+    const optStripTags = document.getElementById('opt-strip-tags');
+    const optEmptyLineResults = document.getElementById('opt-empty-line-results');
+    const optStripTagsResults = document.getElementById('opt-strip-tags-results');
+
+    const summaryFilename = document.getElementById('summary-filename');
+    const summaryFilesize = document.getElementById('summary-filesize');
+    const summaryCues = document.getElementById('summary-cues');
+    const summaryChars = document.getElementById('summary-chars');
+
+    const SAMPLE_SRT = `1\n00:00:01,000 --> 00:00:04,200\nWelcome to our video tutorial!\n\n2\n00:00:04,300 --> 00:00:08,100\nToday we will learn how to extract clean plain text from subtitle files.\n\n3\n00:00:08,200 --> 00:00:11,500\nThis is useful for blogs, transcripts, and study notes.`;
+
+    let selectedFile = null;
+    let selectedFileText = '';
+    let currentFileName = 'subtitles.txt';
+    let rawCuesList = [];
+
+    function showError(msg) {
+      errorMessage.textContent = msg;
+      errorBox.style.display = 'flex';
+    }
+
+    function clearError() {
+      errorBox.style.display = 'none';
+      errorMessage.textContent = '';
+    }
+
+    function formatFileSize(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+    }
+
+    // Pure client-side SRT Parser
+    function parseSrt(rawContent) {
+      const normalized = rawContent
+        .replace(/^\uFEFF/, '') // remove BOM
+        .replace(/\r\n/g, '\n')
+        .replace(/\r/g, '\n');
+
+      if (!normalized.trim()) {
+        return { success: false, error: errEmpty };
+      }
+
+      // Split into candidate blocks by double line-breaks
+      const blocks = normalized.split(/\n\s*\n/);
+      const parsedCues = [];
+      const timestampRegex = /^\d{1,2}:\d{2}:\d{2}[,\.]\d{1,3}\s*-->\s*\d{1,2}:\d{2}:\d{2}[,\.]\d{1,3}/;
+
+      for (let i = 0; i < blocks.length; i++) {
+        const lines = blocks[i].trim().split('\n');
+        if (lines.length === 0 || (lines.length === 1 && !lines[0].trim())) {
+          continue;
+        }
+
+        let timeLineIndex = -1;
+        for (let j = 0; j < lines.length; j++) {
+          if (timestampRegex.test(lines[j].trim())) {
+            timeLineIndex = j;
+            break;
+          }
+        }
+
+        let dialogueLines = [];
+        if (timeLineIndex !== -1) {
+          dialogueLines = lines.slice(timeLineIndex + 1);
+        } else {
+          if (!/^\d+$/.test(lines[0].trim())) {
+            dialogueLines = lines;
+          }
+        }
+
+        if (dialogueLines.length > 0) {
+          const cueText = dialogueLines.join('\n').trim();
+          if (cueText) {
+            parsedCues.push(cueText);
+          }
+        }
+      }
+
+      if (parsedCues.length === 0) {
+        return { success: false, error: errParse };
+      }
+
+      return { success: true, cues: parsedCues };
+    }
+
+    // Live Clean Plain Text Generator
+    function updateLivePreview() {
+      if (!pasteInput || !livePreview) return;
+
+      const raw = pasteInput.value;
+      if (!raw.trim()) {
+        livePreview.value = '';
+        livePreview.placeholder = previewEmptyText;
+        return;
+      }
+
+      const addEmptyLine = optEmptyLine ? optEmptyLine.checked : true;
+      const stripTags = optStripTags ? optStripTags.checked : true;
+
+      const result = parseSrt(raw);
+      if (result.success && result.cues.length > 0) {
+        const cleaned = result.cues.map(function (cue) {
+          let text = cue;
+          if (stripTags) {
+            text = text.replace(/<\/?[a-zA-Z][^>]*>/g, '');
+          }
+          return text.trim();
+        }).filter(function (text) {
+          return text.length > 0;
+        });
+
+        const separator = addEmptyLine ? '\n\n' : '\n';
+        livePreview.value = cleaned.join(separator);
+      }
+    }
+
+    function renderConvertedText() {
+      if (!rawCuesList || rawCuesList.length === 0) return;
+
+      const addEmptyLine = optEmptyLineResults ? optEmptyLineResults.checked : (optEmptyLine ? optEmptyLine.checked : true);
+      const stripTags = optStripTagsResults ? optStripTagsResults.checked : (optStripTags ? optStripTags.checked : true);
+
+      const cleanedCues = rawCuesList.map(function (cue) {
+        let text = cue;
+        if (stripTags) {
+          text = text.replace(/<\/?[a-zA-Z][^>]*>/g, '');
+        }
+        return text.trim();
+      }).filter(function (text) {
+        return text.length > 0;
+      });
+
+      const separator = addEmptyLine ? '\n\n' : '\n';
+      const finalText = cleanedCues.join(separator);
+
+      previewText.value = finalText;
+      summaryChars.textContent = finalText.length.toLocaleString();
+    }
+
+    // Attach File logic
+    function attachFile(file) {
+      clearError();
+      if (!file) return;
+
+      const name = file.name || 'subtitles.srt';
+      const ext = name.toLowerCase().split('.').pop();
+      if (ext !== 'srt' && ext !== 'txt' && !file.type.includes('text')) {
+        showError(errInvalid);
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        selectedFile = file;
+        selectedFileText = e.target.result;
+        attachedFilename.textContent = file.name;
+        attachedFilesize.textContent = formatFileSize(file.size);
+
+        dropzoneDefaultView.style.display = 'none';
+        fileAttachedView.style.display = 'flex';
+
+        // Also populate textarea & live preview for instant feedback
+        if (pasteInput) {
+          pasteInput.value = selectedFileText;
+          updateLivePreview();
+        }
+      };
+
+      reader.onerror = function () {
+        showError(errParse);
+      };
+
+      reader.readAsText(file, 'utf-8');
+    }
+
+    function detachFile() {
+      selectedFile = null;
+      selectedFileText = '';
+      fileInput.value = '';
+      fileAttachedView.style.display = 'none';
+      dropzoneDefaultView.style.display = 'flex';
+    }
+
+    // Convert execution
+    function doConvert() {
+      clearError();
+
+      let textToProcess = '';
+      let sourceName = '';
+      let sourceSize = '';
+
+      if (selectedFile && selectedFileText) {
+        textToProcess = selectedFileText;
+        sourceName = selectedFile.name;
+        sourceSize = formatFileSize(selectedFile.size);
+        currentFileName = selectedFile.name.replace(/\.[^/.]+$/, '') + '.txt';
+      } else if (pasteInput && pasteInput.value.trim().length > 0) {
+        textToProcess = pasteInput.value;
+        sourceName = pastedContentSource;
+        const byteLen = new Blob([pasteInput.value]).size;
+        sourceSize = formatFileSize(byteLen);
+        currentFileName = 'subtitles.txt';
+      } else {
+        showError(errNoInput);
+        return;
+      }
+
+      const result = parseSrt(textToProcess);
+      if (!result.success) {
+        showError(result.error);
+        return;
+      }
+
+      rawCuesList = result.cues;
+      summaryFilename.textContent = sourceName;
+      summaryFilesize.textContent = sourceSize;
+      summaryCues.textContent = rawCuesList.length.toLocaleString();
+
+      if (optEmptyLineResults && optEmptyLine) {
+        optEmptyLineResults.checked = optEmptyLine.checked;
+      }
+      if (optStripTagsResults && optStripTags) {
+        optStripTagsResults.checked = optStripTags.checked;
+      }
+
+      renderConvertedText();
+
+      inputSection.style.display = 'none';
+      processingPanel.style.display = 'flex';
+
+      const root = document.getElementById('converter-root');
+      if (root) {
+        root.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+
+    // Event Listeners: Textarea & Live Preview
+    if (pasteInput) {
+      pasteInput.addEventListener('input', function () {
+        clearError();
+        updateLivePreview();
+        if (selectedFile && pasteInput.value !== selectedFileText) {
+          detachFile();
+        }
+      });
+    }
+
+    if (btnSample) {
+      btnSample.addEventListener('click', function () {
+        clearError();
+        if (selectedFile) detachFile();
+        pasteInput.value = SAMPLE_SRT;
+        updateLivePreview();
+        pasteInput.focus();
+      });
+    }
+
+    if (btnClearPaste) {
+      btnClearPaste.addEventListener('click', function () {
+        pasteInput.value = '';
+        if (livePreview) livePreview.value = '';
+        if (selectedFile) detachFile();
+        clearError();
+        pasteInput.focus();
+      });
+    }
+
+    // Live Preview Copy to Clipboard
+    if (btnCopyLive) {
+      btnCopyLive.addEventListener('click', function () {
+        const text = livePreview ? livePreview.value : '';
+        if (!text) return;
+
+        navigator.clipboard.writeText(text).then(function () {
+          if (copyLiveText) copyLiveText.textContent = copiedSuccess;
+          btnCopyLive.classList.add('btn-pane-primary');
+
+          setTimeout(function () {
+            if (copyLiveText) copyLiveText.textContent = originalCopyText;
+            btnCopyLive.classList.remove('btn-pane-primary');
+          }, 2000);
+        });
+      });
+    }
+
+    // Live Preview Download .TXT
+    if (btnDownloadLive) {
+      btnDownloadLive.addEventListener('click', function () {
+        const text = livePreview ? livePreview.value : '';
+        if (!text) return;
+
+        const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = currentFileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      });
+    }
+
+    // Event Listeners: File Upload & Browse (Unchanged)
+    btnBrowse.addEventListener('click', function (e) {
+      e.stopPropagation();
+      fileInput.click();
+    });
+
+    dropzone.addEventListener('click', function (e) {
+      if (e.target.closest('#btn-remove-file')) return;
+      if (!selectedFile) {
+        fileInput.click();
+      }
+    });
+
+    dropzone.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        if (e.target.closest('#btn-remove-file')) return;
+        if (!selectedFile) {
+          e.preventDefault();
+          fileInput.click();
+        }
+      }
+    });
+
+    fileInput.addEventListener('change', function (e) {
+      if (e.target.files && e.target.files[0]) {
+        attachFile(e.target.files[0]);
+      }
+    });
+
+    btnRemoveFile.addEventListener('click', function (e) {
+      e.stopPropagation();
+      detachFile();
+    });
+
+    // Drag & Drop
+    ['dragenter', 'dragover'].forEach(function (eventName) {
+      dropzone.addEventListener(eventName, function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.classList.add('dragover');
+      });
+    });
+
+    ['dragleave', 'drop'].forEach(function (eventName) {
+      dropzone.addEventListener(eventName, function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.classList.remove('dragover');
+      });
+    });
+
+    dropzone.addEventListener('drop', function (e) {
+      const dt = e.dataTransfer;
+      if (dt && dt.files && dt.files[0]) {
+        attachFile(dt.files[0]);
+      }
+    });
+
+    // Option toggles on input section
+    if (optEmptyLine) {
+      optEmptyLine.addEventListener('change', updateLivePreview);
+    }
+    if (optStripTags) {
+      optStripTags.addEventListener('change', updateLivePreview);
+    }
+
+    // Convert Button
+    btnConvert.addEventListener('click', doConvert);
+
+    // Option toggles in results
+    if (optEmptyLineResults) {
+      optEmptyLineResults.addEventListener('change', function () {
+        if (optEmptyLine) optEmptyLine.checked = optEmptyLineResults.checked;
+        renderConvertedText();
+      });
+    }
+    if (optStripTagsResults) {
+      optStripTagsResults.addEventListener('change', function () {
+        if (optStripTags) optStripTags.checked = optStripTagsResults.checked;
+        renderConvertedText();
+      });
+    }
+
+    // Download Button (Results)
+    btnDownload.addEventListener('click', function () {
+      const content = previewText.value;
+      if (!content) return;
+
+      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = currentFileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+
+    // Copy to Clipboard (Results)
+    btnCopy.addEventListener('click', function () {
+      const content = previewText.value;
+      if (!content) return;
+
+      navigator.clipboard.writeText(content).then(function () {
+        copyBtnText.textContent = copiedSuccess;
+        btnCopy.classList.add('btn-primary');
+        btnCopy.classList.remove('btn-secondary');
+
+        setTimeout(function () {
+          copyBtnText.textContent = originalCopyText;
+          btnCopy.classList.remove('btn-primary');
+          btnCopy.classList.add('btn-secondary');
+        }, 2000);
+      });
+    });
+
+    // Reset Button (Convert Another File)
+    btnReset.addEventListener('click', function () {
+      detachFile();
+      if (pasteInput) {
+        pasteInput.value = '';
+      }
+      if (livePreview) {
+        livePreview.value = '';
+      }
+      previewText.value = '';
+      rawCuesList = [];
+      clearError();
+      processingPanel.style.display = 'none';
+      inputSection.style.display = 'flex';
+
+      const root = document.getElementById('converter-root');
+      if (root) {
+        root.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    });
+  })();
+</script>

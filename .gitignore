@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+
+# Build and cache outputs
+dist/
+.astro/
+
+# Environment files and sensitive credentials
+.env
+.env.*
+!.env.example
+*.env
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# System & OS metadata
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE & Editor directories
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Temporary files & caches
+tmp/
+temp/

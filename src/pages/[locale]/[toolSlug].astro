@@ -1,0 +1,466 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SEOHead from '../../components/SEOHead.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import SrtToTxtTool from '../../components/converter/SrtToTxtTool.astro';
+import TxtToSrtTool from '../../components/converter/TxtToSrtTool.astro';
+import { LOCALES, DEFAULT_LOCALE, type Locale } from '../../i18n/locales';
+import { TOOL_ROUTES, getToolPath, getHomePath, getPagePath } from '../../i18n/routes';
+import { getToolData } from '../../data/tools';
+import { HOME_CONTENT } from '../../data/homeContent';
+import { getUi } from '../../i18n/ui';
+
+export function getStaticPaths() {
+  const paths = [];
+  const nonDefaultLocales = LOCALES.filter((l) => l !== DEFAULT_LOCALE);
+
+  for (const tool of Object.values(TOOL_ROUTES)) {
+    for (const locale of nonDefaultLocales) {
+      const toolSlug = tool.slugs[locale];
+      paths.push({
+        params: {
+          locale,
+          toolSlug,
+        },
+        props: {
+          toolId: tool.id,
+          locale,
+          toolSlug,
+        },
+      });
+    }
+  }
+
+  return paths;
+}
+
+interface Props {
+  toolId: string;
+  locale: Locale;
+  toolSlug: string;
+}
+
+const { toolId, locale, toolSlug } = Astro.props;
+const toolData = getToolData(toolId, locale);
+
+if (!toolData) {
+  throw new Error(`Missing tool data for "${toolId}" in locale "${locale}"`);
+}
+
+const ui = getUi(locale);
+const canonicalPath = getToolPath(toolId, locale);
+const homePath = getHomePath(locale);
+
+const breadcrumbs = [
+  { name: ui.breadcrumbs.home, path: homePath },
+  { name: ui.breadcrumbs.tools, path: getPagePath('tools', locale) },
+  { name: toolData.toolName, path: canonicalPath },
+];
+---
+
+<BaseLayout locale={locale} pageType="tool" pageId={toolId}>
+  <SEOHead
+    slot="head"
+    title={toolData.metaTitle}
+    description={toolData.metaDescription}
+    locale={locale}
+    canonicalPath={canonicalPath}
+    pageType="tool"
+    pageId={toolId}
+    faqList={toolData.faqs}
+    breadcrumbs={breadcrumbs}
+  />
+
+  <div class="container tool-page-container">
+    <Breadcrumbs crumbs={breadcrumbs} />
+
+    <!-- Hero Header -->
+    <header class="tool-header">
+      <div class="tool-badges">
+        <span class="badge">{ui.common.clientSideBadge}</span>
+        <span class="badge">{ui.common.noUploadBadge}</span>
+        <span class="badge">{ui.common.freeBadge}</span>
+      </div>
+      <h1 class="tool-title">{toolData.h1}</h1>
+      <p class="tool-description">{toolData.heroDescription}</p>
+    </header>
+
+    <!-- Interactive Converter Tool Switch -->
+    {toolId === 'srt-to-txt' && (
+      <SrtToTxtTool content={toolData as any} locale={locale} />
+    )}
+    {toolId === 'txt-to-srt' && (
+      <TxtToSrtTool content={toolData as any} locale={locale} />
+    )}
+
+    <!-- Explanatory Content & Guide Sections -->
+    <article class="tool-content-article">
+      <!-- How to Convert -->
+      {toolData.sections.howToConvert && (
+        <section class="content-section">
+          <h2>{toolData.sections.howToConvert.title}</h2>
+          <div class="steps-grid">
+            {toolData.sections.howToConvert.steps.map((step) => (
+              <div class="step-card">
+                <h3 class="step-title">{step.title}</h3>
+                <p class="step-desc">{step.description}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <!-- What is TXT (if present) -->
+      {(toolData.sections as any).whatIsTxt && (
+        <section class="content-section">
+          <h2>{(toolData.sections as any).whatIsTxt.title}</h2>
+          {(toolData.sections as any).whatIsTxt.content.map((p: string) => (
+            <p class="text-block">{p}</p>
+          ))}
+        </section>
+      )}
+
+      <!-- What is an SRT File -->
+      {toolData.sections.whatIsSrt && (
+        <section class="content-section">
+          <h2>{toolData.sections.whatIsSrt.title}</h2>
+          {toolData.sections.whatIsSrt.content.map((p) => (
+            <p class="text-block">{p}</p>
+          ))}
+        </section>
+      )}
+
+      <!-- What is Converter -->
+      {toolData.sections.whatIsConverter && (
+        <section class="content-section">
+          <h2>{toolData.sections.whatIsConverter.title}</h2>
+          {toolData.sections.whatIsConverter.content.map((p) => (
+            <p class="text-block">{p}</p>
+          ))}
+        </section>
+      )}
+
+      <!-- Why Rename Doesn't Work (txt-to-srt specific) -->
+      {(toolData.sections as any).whyRenameDoesntWork && (
+        <section class="content-section">
+          <h2>{(toolData.sections as any).whyRenameDoesntWork.title}</h2>
+          {(toolData.sections as any).whyRenameDoesntWork.content.map((p: string) => (
+            <p class="text-block">{p}</p>
+          ))}
+        </section>
+      )}
+
+      <!-- Timing & Sync Explanation (txt-to-srt specific) -->
+      {(toolData.sections as any).timingAndSyncExplanation && (
+        <section class="content-section">
+          <h2>{(toolData.sections as any).timingAndSyncExplanation.title}</h2>
+          {(toolData.sections as any).timingAndSyncExplanation.content.map((p: string) => (
+            <p class="text-block">{p}</p>
+          ))}
+        </section>
+      )}
+
+      <!-- Why Convert (srt-to-txt specific) -->
+      {(toolData.sections as any).whyConvert && (
+        <section class="content-section">
+          <h2>{(toolData.sections as any).whyConvert.title}</h2>
+          <div class="benefits-grid">
+            {(toolData.sections as any).whyConvert.benefits.map((benefit: any) => (
+              <div class="benefit-card">
+                <h3 class="benefit-title">{benefit.title}</h3>
+                <p class="benefit-desc">{benefit.description}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <!-- Real World Use Cases (txt-to-srt specific) -->
+      {(toolData.sections as any).realWorldUseCases && (
+        <section class="content-section">
+          <h2>{(toolData.sections as any).realWorldUseCases.title}</h2>
+          <div class="benefits-grid">
+            {(toolData.sections as any).realWorldUseCases.cases.map((item: any) => (
+              <div class="benefit-card">
+                <h3 class="benefit-title">{item.title}</h3>
+                <p class="benefit-desc">{item.description}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <!-- Common Errors and Fixes (txt-to-srt specific) -->
+      {(toolData.sections as any).commonErrorsAndFixes && (
+        <section class="content-section">
+          <h2>{(toolData.sections as any).commonErrorsAndFixes.title}</h2>
+          <div class="steps-grid">
+            {(toolData.sections as any).commonErrorsAndFixes.items.map((item: any) => (
+              <div class="step-card">
+                <h3 class="step-title">{item.title}</h3>
+                <p class="step-desc">{item.description}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <!-- Comparison Table -->
+      {toolData.sections.comparison && (
+        <section class="content-section">
+          <h2>{toolData.sections.comparison.title}</h2>
+          <p class="text-block">{toolData.sections.comparison.description}</p>
+
+          <div class="table-wrapper">
+            <table class="comparison-table">
+              <thead>
+                <tr>
+                  {toolData.sections.comparison.headers.map((h) => (
+                    <th>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {toolData.sections.comparison.rows.map((row) => (
+                  <tr>
+                    <td><strong>{row[0]}</strong></td>
+                    <td>{row[1]}</td>
+                    <td>{row[2]}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
+
+      <!-- Privacy Guarantee -->
+      {toolData.sections.privacy && (
+        <section class="content-section privacy-highlight">
+          <h2>{toolData.sections.privacy.title}</h2>
+          {toolData.sections.privacy.content.map((p) => (
+            <p class="text-block">{p}</p>
+          ))}
+        </section>
+      )}
+
+      <!-- FAQs -->
+      <FAQSection faqs={toolData.faqs} title={HOME_CONTENT[locale].faqHeading} />
+    </article>
+  </div>
+</BaseLayout>
+
+<style>
+  .tool-page-container {
+    padding-block: 2rem 4rem;
+    width: 100%;
+    max-width: var(--max-w-page);
+    box-sizing: border-box;
+  }
+
+  .tool-header {
+    text-align: start;
+    max-width: 800px;
+    margin-block-end: 2.25rem;
+  }
+
+  .tool-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-block-end: 1rem;
+  }
+
+  .tool-title {
+    font-size: clamp(1.75rem, 4.5vw, 2.75rem);
+    font-weight: 800;
+    line-height: 1.15;
+    margin-block-end: 1rem;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+
+  .tool-description {
+    font-size: 1.125rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+  }
+
+  .tool-content-article {
+    max-width: 860px;
+    margin-inline: auto;
+    margin-block-start: 2rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .content-section {
+    margin-block-end: 3.5rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .content-section h2 {
+    font-size: 1.625rem;
+    font-weight: 700;
+    margin-block-end: 1rem;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+
+  .text-block {
+    margin-block-end: 1rem;
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+
+  /* Steps Grid */
+  .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.25rem;
+    margin-block-start: 1.25rem;
+  }
+
+  .step-card {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+  }
+
+  .step-title {
+    font-size: 1.0625rem;
+    font-weight: 700;
+    margin-block-end: 0.5rem;
+    word-break: break-word;
+  }
+
+  .step-desc {
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    color: var(--text-secondary);
+  }
+
+  /* Benefits Grid */
+  .benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.25rem;
+    margin-block-start: 1.25rem;
+  }
+
+  .benefit-card {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+  }
+
+  .benefit-title {
+    font-size: 1.0625rem;
+    font-weight: 700;
+    margin-block-end: 0.5rem;
+    word-break: break-word;
+  }
+
+  .benefit-desc {
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    color: var(--text-secondary);
+  }
+
+  /* Comparison Table */
+  .table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-block-start: 1.25rem;
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .comparison-table {
+    width: 100%;
+    min-width: 480px;
+    border-collapse: collapse;
+    text-align: start;
+    font-size: 0.9375rem;
+  }
+
+  .comparison-table th,
+  .comparison-table td {
+    padding: 0.875rem 1.125rem;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .comparison-table th {
+    background-color: var(--bg-surface-hover);
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .comparison-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .comparison-table td {
+    color: var(--text-secondary);
+  }
+
+  /* Privacy highlight card */
+  .privacy-highlight {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    padding: 1.75rem;
+  }
+
+  /* ==========================================================================
+     MOBILE RESPONSIVENESS (< 640px)
+     ========================================================================== */
+  @media (max-width: 640px) {
+    .tool-page-container {
+      padding-block: 1.25rem 2.5rem;
+    }
+
+    .tool-header {
+      margin-block-end: 1.5rem;
+    }
+
+    .tool-description {
+      font-size: 1rem;
+    }
+
+    .content-section {
+      margin-block-end: 2.25rem;
+    }
+
+    .content-section h2 {
+      font-size: 1.375rem;
+    }
+
+    .steps-grid,
+    .benefits-grid {
+      grid-template-columns: 1fr;
+      gap: 0.875rem;
+    }
+
+    .step-card,
+    .benefit-card {
+      padding: 1.125rem;
+    }
+
+    .privacy-highlight {
+      padding: 1.25rem 1rem;
+    }
+
+    .comparison-table th,
+    .comparison-table td {
+      padding: 0.625rem 0.75rem;
+      font-size: 0.84rem;
+    }
+  }
+</style>

@@ -1,0 +1,284 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SEOHead from '../components/SEOHead.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { DEFAULT_LOCALE } from '../i18n/locales';
+import { getPagePath, getHomePath } from '../i18n/routes';
+import { getUi } from '../i18n/ui';
+
+const locale = DEFAULT_LOCALE;
+const ui = getUi(locale);
+const canonicalPath = getPagePath('terms', locale);
+const homePath = getHomePath(locale);
+const contactPath = getPagePath('contact', locale);
+
+const breadcrumbs = [
+  { name: ui.breadcrumbs.home, path: homePath },
+  { name: ui.footer.termsOfService, path: canonicalPath },
+];
+
+const pageTitle = `${ui.footer.termsOfService} – ${ui.siteName}`;
+const pageDescription = 'Review the Terms of Service for using srtconverters.info and our browser-based subtitle and file conversion utilities.';
+---
+
+<BaseLayout locale={locale} pageType="page" pageId="terms">
+  <SEOHead
+    slot="head"
+    title={pageTitle}
+    description={pageDescription}
+    locale={locale}
+    canonicalPath={canonicalPath}
+    pageType="page"
+    pageId="terms"
+    breadcrumbs={breadcrumbs}
+  />
+
+  <div class="content-container page-content-container">
+    <Breadcrumbs crumbs={breadcrumbs} />
+
+    <header class="page-header">
+      <div class="header-badge-wrap">
+        <span class="badge">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+            <polyline points="10 9 9 9 8 9"/>
+          </svg>
+          <span>User Agreement</span>
+        </span>
+      </div>
+      <h1 class="page-title">{ui.footer.termsOfService}</h1>
+      <p class="page-subtitle">Last updated: September 2026</p>
+    </header>
+
+    <article class="prose">
+      <section class="prose-section">
+        <h2>1. Acceptance of Terms</h2>
+        <p>
+          These Terms of Service (&ldquo;Terms&rdquo;) govern your access to and use of <strong>srtconverters.info</strong> (&ldquo;we&rdquo;, &ldquo;our&rdquo;, or &ldquo;the website&rdquo;), including all tools, software algorithms, features, content, and related services offered on this site.
+        </p>
+        <p>
+          By visiting, accessing, or using srtconverters.info, you acknowledge that you have read, understood, and agreed to be bound by these Terms and our <a href={getPagePath('privacy', locale)}>Privacy Policy</a>. If you do not agree with any part of these Terms, you must discontinue using our website and tools immediately.
+        </p>
+      </section>
+
+      <section class="prose-section">
+        <h2>2. Description of Services & Online Tools</h2>
+        <p>
+          <strong>srtconverters.info</strong> provides specialized, browser-based utilities for subtitle creators, video editors, translators, transcribers, and general audiences. Our core tools include:
+        </p>
+        <ul>
+          <li><strong>SRT to TXT Converter:</strong> Stripping sequence indexes and timestamps to extract clean, readable plain text from SubRip files.</li>
+          <li><strong>TXT to SRT Converter:</strong> Formatting raw text, scripts, or transcripts into standard numbered SubRip subtitles with automated timecodes.</li>
+          <li>Additional subtitle and transcription utilities as added to the platform.</li>
+        </ul>
+        <p>
+          All tool processing is designed to execute client-side directly within your web browser.
+        </p>
+      </section>
+
+      <section class="prose-section">
+        <h2>3. Permitted Use</h2>
+        <p>
+          You are granted a non-exclusive, revocable, non-transferable, worldwide right to access and use srtconverters.info for:
+        </p>
+        <ul>
+          <li>Lawful personal, academic, educational, non-profit, or commercial conversion of subtitle files and transcripts.</li>
+          <li>Formatting dialogue tracks and captions for personal or commercial video production (e.g., YouTube, TikTok, streaming platforms, film, television, educational courses).</li>
+        </ul>
+      </section>
+
+      <section class="prose-section">
+        <h2>4. User Responsibilities & Prohibited Uses</h2>
+        <p>
+          You agree to use srtconverters.info responsibly and in full compliance with all applicable local, national, and international laws. Specifically, you agree NOT to:
+        </p>
+        <ul>
+          <li>Use the website or its tools for any illegal, fraudulent, harmful, or defamatory purpose.</li>
+          <li>Process any content that infringes upon third-party copyrights, trademarks, publicity rights, or intellectual property rights.</li>
+          <li>Attempt to interfere with, disrupt, damage, or impair the normal functioning, security, or network infrastructure of the website.</li>
+          <li>Deploy automated scripts, bots, spiders, or scrapers in an abusive manner that degrades website speed, server stability, or availability for other users.</li>
+          <li>Reverse-engineer, decompile, or copy the website&rsquo;s design system, layout, or proprietary codebase for competitive cloning or malicious purposes.</li>
+        </ul>
+      </section>
+
+      <section class="prose-section">
+        <h2>5. Content Ownership & File Responsibility</h2>
+        <p>
+          <strong>You retain 100% full ownership, intellectual property rights, and copyright</strong> over any subtitle files, transcripts, text scripts, or audio dialogue that you input, process, or convert through our tools.
+        </p>
+        <ul>
+          <li>We do not claim any ownership, license, or copyright interest in your files or converted output.</li>
+          <li>Because file processing occurs locally in your device&rsquo;s browser, your content is never stored on our servers.</li>
+          <li>You are solely responsible for ensuring that you possess the necessary legal rights, permissions, or licenses to convert, format, or distribute the media and text you submit to our tools.</li>
+        </ul>
+      </section>
+
+      <section class="prose-section">
+        <h2>6. Accuracy & Limitations of Generated Results</h2>
+        <p>
+          While we rigorously test our parsing algorithms across diverse encodings, character sets, and subtitle standards, you acknowledge that:
+        </p>
+        <ul>
+          <li><strong>Automated Timing Estimation:</strong> When using tools such as TXT to SRT, timestamp calculations are generated progressively using mathematical pacing based on your specified duration settings. Because automated pacing cannot predict natural speech pauses or vocal cadence, converted subtitles typically require minor manual adjustment in your video editor or subtitle timeline to achieve exact synchronization.</li>
+          <li><strong>Malformed Files:</strong> If an uploaded input file contains corrupt headers, non-standard timestamp structures, or unreadable encoding, the converter may produce partial results or display an error notice.</li>
+          <li><strong>User Verification:</strong> You are responsible for inspecting and verifying the accuracy, timing, and formatting of converted subtitle files prior to publication, broadcasting, or client delivery.</li>
+        </ul>
+      </section>
+
+      <section class="prose-section">
+        <h2>7. Intellectual Property of srtconverters.info</h2>
+        <p>
+          The website design, layout, logo, graphical assets, CSS styling, user interface, domain name, and original software code comprising srtconverters.info are the exclusive intellectual property of srtconverters.info and are protected by international copyright, trademark, and unfair competition laws.
+        </p>
+        <p>
+          Nothing in these Terms grants you ownership of our platform, branding, or website code, except for the limited right to use the website as provided herein.
+        </p>
+      </section>
+
+      <section class="prose-section">
+        <h2>8. Third-Party Services, Ads, & External Links</h2>
+        <p>
+          Our website displays third-party advertisements (such as Google AdSense) to support our free operations. We may also provide links to third-party websites or external documentation for informational convenience.
+        </p>
+        <p>
+          We do not endorse, guarantee, or assume responsibility for any third-party products, services, advertisements, or external content. Your interactions with third-party advertisers or websites are governed solely by their respective terms and privacy policies.
+        </p>
+      </section>
+
+      <section class="prose-section">
+        <h2>9. Disclaimer of Warranties</h2>
+        <p>
+          TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE WEBSITE, ITS TOOLS, AND ALL CONTENT ARE PROVIDED ON AN <strong>&ldquo;AS IS&rdquo;</strong> AND <strong>&ldquo;AS AVAILABLE&rdquo;</strong> BASIS, WITHOUT WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED.
+        </p>
+        <p>
+          WE EXPRESSLY DISCLAIM ALL WARRANTIES, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, WORKMANLIKE EFFORT, TITLE, AND NON-INFRINGEMENT. WE DO NOT WARRANT THAT THE WEBSITE WILL BE UNINTERRUPTED, ERROR-FREE, TIMELY, SECURE, OR FREE FROM HARMFUL COMPONENTS, OR THAT ANY DEFECTS WILL BE CORRECTED.
+        </p>
+      </section>
+
+      <section class="prose-section">
+        <h2>10. Limitation of Liability</h2>
+        <p>
+          TO THE FULLEST EXTENT PERMISSIBLE UNDER APPLICABLE LAW, IN NO EVENT SHALL SRTCONVERTERS.INFO, ITS OPERATORS, AFFILIATES, OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, CONSEQUENTIAL, SPECIAL, PUNITIVE, OR EXEMPLARY DAMAGES WHATSOEVER (INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF PROFITS, DATA LOSS, CORRUPTION OF SUBTITLE FILES, AUDIO-VIDEO SYNCHRONIZATION ERRORS, BUSINESS INTERRUPTION, OR REPUTATIONAL HARM), ARISING OUT OF OR IN CONNECTION WITH YOUR USE OR INABILITY TO USE THE WEBSITE OR TOOLS, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+        </p>
+        <p>
+          IF YOU ARE DISSATISFIED WITH ANY PORTION OF THIS WEBSITE OR THESE TERMS, YOUR SOLE AND EXCLUSIVE REMEDY IS TO CEASE USING THE WEBSITE.
+        </p>
+      </section>
+
+      <section class="prose-section">
+        <h2>11. Service Modifications & Availability</h2>
+        <p>
+          We reserve the right to modify, enhance, update, suspend, or discontinue any tool, feature, or part of srtconverters.info at any time, with or without notice, and without liability to you or any third party. While we endeavor to maintain 24/7 availability, we do not guarantee continuous, uninterrupted access.
+        </p>
+      </section>
+
+      <section class="prose-section">
+        <h2>12. Termination of Access</h2>
+        <p>
+          We reserve the right, without prior notice or liability, to suspend, block, or terminate access to the website for any user who violates these Terms, engages in malicious activities, or abuses website resources.
+        </p>
+      </section>
+
+      <section class="prose-section">
+        <h2>13. Governing Law & General Provisions</h2>
+        <p>
+          These Terms constitute the complete and exclusive agreement between you and srtconverters.info regarding your use of the website.
+        </p>
+        <ul>
+          <li><strong>Severability:</strong> If any provision of these Terms is determined by a court of competent jurisdiction to be invalid, unlawful, or unenforceable, that provision shall be severed or modified to the minimum extent necessary, and the remaining provisions shall continue in full force and effect.</li>
+          <li><strong>No Waiver:</strong> Our failure to enforce any right or provision of these Terms will not be deemed a waiver of such right or provision.</li>
+        </ul>
+      </section>
+
+      <section class="prose-section">
+        <h2>14. Changes to Terms</h2>
+        <p>
+          We may revise these Terms of Service periodically to reflect changes in our tools, legal requirements, or platform features. When changes are made, the updated version will be published on this page with an updated &ldquo;Last updated&rdquo; date. Your continued use of the website following the posting of revised Terms signifies your acceptance of those modifications.
+        </p>
+      </section>
+
+      <section class="prose-section">
+        <h2>15. Contact Information</h2>
+        <p>
+          If you have questions, comments, or legal inquiries regarding these Terms of Service, please reach out to us through our <a href={contactPath}>Contact page</a>.
+        </p>
+      </section>
+    </article>
+  </div>
+</BaseLayout>
+
+<style>
+  .page-content-container {
+    padding-block: 2rem 5rem;
+    max-width: 820px;
+  }
+
+  .page-header {
+    margin-block-end: 2rem;
+  }
+
+  .header-badge-wrap {
+    margin-bottom: 0.75rem;
+  }
+
+  .page-title {
+    font-size: clamp(2rem, 4vw, 2.5rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.35rem;
+  }
+
+  .page-subtitle {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  .prose-section {
+    margin-block-end: 2.5rem;
+  }
+
+  .prose-section h2 {
+    font-size: 1.375rem;
+    font-weight: 700;
+    margin-block-end: 0.875rem;
+    letter-spacing: -0.01em;
+    color: var(--text-primary);
+  }
+
+  .prose-section p {
+    font-size: 0.96875rem;
+    line-height: 1.7;
+    margin-block-end: 0.875rem;
+    color: var(--text-secondary);
+  }
+
+  .prose-section ul {
+    margin-inline-start: 1.5rem;
+    margin-block-end: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.96875rem;
+    line-height: 1.65;
+    color: var(--text-secondary);
+  }
+
+  .prose-section li strong {
+    color: var(--text-primary);
+  }
+
+  .prose-section a {
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+
+  @media (max-width: 640px) {
+    .page-content-container {
+      padding-block: 1.5rem 3.5rem;
+    }
+  }
+</style>

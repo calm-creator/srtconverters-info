@@ -1,0 +1,47 @@
+---
+import '../styles/global.css';
+import { LOCALES_META, type Locale } from '../i18n/locales';
+import { getUi } from '../i18n/ui';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+interface Props {
+  locale: Locale;
+  pageType: 'home' | 'tool' | 'page';
+  pageId: string;
+}
+
+const { locale, pageType, pageId } = Astro.props;
+const localeMeta = LOCALES_META[locale];
+const ui = getUi(locale);
+---
+
+<!doctype html>
+<html lang={localeMeta.langTag} dir={localeMeta.dir}>
+  <head>
+    <script is:inline>
+      (function () {
+        try {
+          const saved = localStorage.getItem('theme');
+          const prefDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          const theme = saved || (prefDark ? 'dark' : 'light');
+          document.documentElement.setAttribute('data-theme', theme);
+        } catch (e) {}
+      })();
+    </script>
+    <slot name="head" />
+  </head>
+  <body>
+    <a href="#main-content" class="skip-to-content">
+      {ui.skipToContent}
+    </a>
+
+    <Header locale={locale} pageType={pageType} pageId={pageId} />
+
+    <main id="main-content">
+      <slot />
+    </main>
+
+    <Footer locale={locale} />
+  </body>
+</html>

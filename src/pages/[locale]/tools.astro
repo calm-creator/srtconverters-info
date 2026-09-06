@@ -1,0 +1,301 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SEOHead from '../../components/SEOHead.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { LOCALES, DEFAULT_LOCALE, type Locale } from '../../i18n/locales';
+import { getPagePath, getHomePath, getToolPath } from '../../i18n/routes';
+import { getAllTools } from '../../data/tools';
+import { TOOLS_PAGE_CONTENT } from '../../data/toolsPageContent';
+import { getUi } from '../../i18n/ui';
+
+export function getStaticPaths() {
+  return LOCALES.filter((l) => l !== DEFAULT_LOCALE).map((locale) => ({
+    params: { locale },
+  }));
+}
+
+const { locale } = Astro.params as { locale: Locale };
+const ui = getUi(locale);
+const pageContent = TOOLS_PAGE_CONTENT[locale] || TOOLS_PAGE_CONTENT.en;
+const canonicalPath = getPagePath('tools', locale);
+const homePath = getHomePath(locale);
+const tools = getAllTools();
+
+const breadcrumbs = [
+  { name: ui.breadcrumbs.home, path: homePath },
+  { name: ui.nav.tools, path: canonicalPath },
+];
+
+const pageTitle = pageContent.metaTitle;
+const pageDescription = pageContent.metaDescription;
+---
+
+<BaseLayout locale={locale} pageType="page" pageId="tools">
+  <SEOHead
+    slot="head"
+    title={pageTitle}
+    description={pageDescription}
+    locale={locale}
+    canonicalPath={canonicalPath}
+    pageType="page"
+    pageId="tools"
+    breadcrumbs={breadcrumbs}
+  />
+
+  <div class="container tools-page-container">
+    <Breadcrumbs crumbs={breadcrumbs} />
+
+    <!-- Page Header -->
+    <header class="tools-page-header">
+      <div class="header-badge-row">
+        <span class="badge badge-featured">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+          <span>{ui.common.clientSideBadge}</span>
+        </span>
+        <span class="tools-count-pill">{pageContent.toolCountLabel}</span>
+      </div>
+      <h1 class="tools-page-title">{pageContent.heading}</h1>
+      <p class="tools-page-desc">{pageContent.description}</p>
+    </header>
+
+    <!-- Tools Showcase Grid -->
+    <div class="tools-grid">
+      {tools.map((tool) => {
+        const toolUrl = getToolPath(tool.id, locale);
+        const toolName = tool.name[locale] || tool.name.en;
+        const toolDesc = tool.shortDescription[locale] || tool.shortDescription.en;
+        const categoryLabel = pageContent.toolCategories[tool.id];
+
+        return (
+          <article class="tool-card">
+            <div class="tool-card-top">
+              <div class="tool-card-icon-wrap" aria-hidden="true">
+                {tool.id === 'txt-to-srt' ? (
+                  <svg class="tool-card-icon" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <circle cx="12" cy="14" r="4"/>
+                    <polyline points="12 12 12 14 14 15"/>
+                  </svg>
+                ) : (
+                  <svg class="tool-card-icon" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="16" y1="13" x2="8" y2="13"/>
+                    <line x1="16" y1="17" x2="8" y2="17"/>
+                    <line x1="10" y1="9" x2="8" y2="9"/>
+                  </svg>
+                )}
+              </div>
+              {categoryLabel && (
+                <span class="tool-card-category">{categoryLabel}</span>
+              )}
+            </div>
+
+            <div class="tool-card-body">
+              <h2 class="tool-card-title">{toolName}</h2>
+              <p class="tool-card-desc">{toolDesc}</p>
+            </div>
+
+            <div class="tool-card-action">
+              <a href={toolUrl} class="btn btn-primary tool-link">
+                <span>{pageContent.openToolLabel}</span>
+                <svg class="icon-flip-rtl" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                  <polyline points="12 5 19 12 12 19" />
+                </svg>
+              </a>
+            </div>
+          </article>
+        );
+      })}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .tools-page-container {
+    padding-block: 2.5rem 5rem;
+    width: 100%;
+    max-width: var(--max-w-page);
+    box-sizing: border-box;
+  }
+
+  .tools-page-header {
+    text-align: start;
+    max-width: 820px;
+    margin-block-end: 2.75rem;
+  }
+
+  .header-badge-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-block-end: 1.125rem;
+  }
+
+  .tools-count-pill {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-default);
+    padding: 0.25rem 0.625rem;
+    border-radius: var(--radius-full);
+  }
+
+  .tools-page-title {
+    font-size: clamp(2rem, 4vw, 2.75rem);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    line-height: 1.2;
+    margin-block-end: 1rem;
+    color: var(--text-primary);
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+
+  .tools-page-desc {
+    font-size: 1.125rem;
+    color: var(--text-secondary);
+    line-height: 1.65;
+    margin: 0;
+  }
+
+  /* Tools Grid */
+  .tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.75rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .tool-card {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.15s ease;
+    box-sizing: border-box;
+    position: relative;
+  }
+
+  .tool-card:hover {
+    border-color: var(--border-focus);
+    background-color: var(--bg-surface-elevated);
+    transform: translateY(-2px);
+  }
+
+  .tool-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    width: 100%;
+  }
+
+  .tool-card-icon-wrap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md);
+    background-color: var(--bg-surface-elevated);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-primary);
+    flex-shrink: 0;
+  }
+
+  .tool-card:hover .tool-card-icon-wrap {
+    border-color: var(--border-default);
+  }
+
+  .tool-card-category {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+    background-color: var(--bg-surface-elevated);
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-subtle);
+  }
+
+  .tool-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .tool-card-title {
+    font-size: 1.3125rem;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: -0.015em;
+    word-break: break-word;
+    color: var(--text-primary);
+  }
+
+  .tool-card-desc {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  .tool-card-action {
+    margin-top: auto;
+  }
+
+  .tool-link {
+    width: 100%;
+    justify-content: space-between;
+    font-weight: 600;
+    padding-block: 0.75rem;
+  }
+
+  @media (max-width: 640px) {
+    .tools-page-container {
+      padding-block: 1.5rem 3.5rem;
+    }
+
+    .tools-page-header {
+      margin-block-end: 2rem;
+    }
+
+    .tools-page-title {
+      font-size: 1.75rem;
+    }
+
+    .tools-page-desc {
+      font-size: 1rem;
+    }
+
+    .tools-grid {
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+    }
+
+    .tool-card {
+      padding: 1.5rem;
+      gap: 1.25rem;
+    }
+
+    .tool-card-icon-wrap {
+      width: 42px;
+      height: 42px;
+    }
+  }
+</style>

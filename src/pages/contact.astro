@@ -1,0 +1,131 @@
+﻿---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SEOHead from '../components/SEOHead.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { DEFAULT_LOCALE } from '../i18n/locales';
+import { getPagePath, getHomePath } from '../i18n/routes';
+import { getUi } from '../i18n/ui';
+
+const locale = DEFAULT_LOCALE;
+const ui = getUi(locale);
+const canonicalPath = getPagePath('contact', locale);
+const homePath = getHomePath(locale);
+
+const breadcrumbs = [
+  { name: ui.breadcrumbs.home, path: homePath },
+  { name: ui.footer.contact, path: canonicalPath },
+];
+---
+
+<BaseLayout locale={locale} pageType="page" pageId="contact">
+  <SEOHead
+    slot="head"
+    title={`${ui.footer.contact} – srtconverters.info`}
+    description={ui.footer.aboutText}
+    locale={locale}
+    canonicalPath={canonicalPath}
+    pageType="page"
+    pageId="contact"
+    breadcrumbs={breadcrumbs}
+  />
+
+  <div class="content-container page-content-container">
+    <Breadcrumbs crumbs={breadcrumbs} />
+
+    <header class="page-header">
+      <h1 class="page-title">{ui.footer.contact}</h1>
+    </header>
+
+    <article class="prose">
+      <section class="prose-section">
+        <h2>Get in Touch</h2>
+        <p>
+          Have questions, bug reports, feature suggestions, or format compatibility feedback? We welcome inquiries and suggestions to make srtconverters.info better for everyone.
+        </p>
+        <p>
+          You can reach our team directly at:
+        </p>
+        <div class="contact-box">
+          <svg class="contact-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect width="20" height="16" x="2" y="4" rx="2" />
+            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+          </svg>
+          <a href="mailto:support@srtconverters.info" class="contact-email">
+            support@srtconverters.info
+          </a>
+        </div>
+      </section>
+    </article>
+  </div>
+</BaseLayout>
+
+<style>
+  .page-content-container {
+    padding-block: 2.5rem 5rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .page-header {
+    margin-block-end: 2rem;
+  }
+
+  .page-title {
+    font-size: clamp(1.75rem, 5vw, 2.5rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    word-break: break-word;
+  }
+
+  .prose-section {
+    margin-block-end: 2.5rem;
+  }
+
+  .prose-section h2 {
+    font-size: 1.375rem;
+    font-weight: 700;
+    margin-block-end: 0.75rem;
+    word-break: break-word;
+  }
+
+  .prose-section p {
+    font-size: 1rem;
+    line-height: 1.7;
+    margin-block-end: 1rem;
+    overflow-wrap: break-word;
+  }
+
+  .contact-box {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    margin-top: 0.5rem;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .contact-icon {
+    flex-shrink: 0;
+  }
+
+  .contact-email {
+    font-weight: 600;
+    color: var(--text-primary);
+    word-break: break-all;
+  }
+
+  @media (max-width: 640px) {
+    .page-content-container {
+      padding-block: 1.5rem 3rem;
+    }
+
+    .contact-box {
+      width: 100%;
+      padding: 0.875rem 1rem;
+    }
+  }
+</style>

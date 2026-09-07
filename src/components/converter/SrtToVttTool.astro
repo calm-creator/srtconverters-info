@@ -1,0 +1,1236 @@
+---
+import type { SrtToVttDetailContent } from '../../data/tools/srt-to-vtt';
+
+interface Props {
+  content: SrtToVttDetailContent;
+  locale: string;
+}
+
+const { content, locale } = Astro.props;
+const ui = content.ui;
+---
+
+<div class="converter-card" id="converter-root" data-locale={locale}>
+  <!-- Input Section -->
+  <div class="input-section" id="input-section">
+    <!-- Top 2-Column Editor Grid (Desktop: 2 Columns / Mobile: Stacked) -->
+    <div class="editor-grid">
+      <!-- Left: SRT Input (.srt) -->
+      <div class="editor-pane srt-input-pane">
+        <div class="pane-header">
+          <div class="pane-title-group">
+            <svg class="pane-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+              <polyline points="14 2 14 8 20 8"/>
+            </svg>
+            <label for="srt-paste-input" class="pane-title">{ui.pasteTitle}</label>
+          </div>
+          <div class="pane-actions">
+            <button
+              type="button"
+              class="btn-pane-action"
+              id="btn-sample"
+              aria-label={ui.trySampleButton}
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polygon points="5 3 19 12 5 21 5 3"/>
+              </svg>
+              <span>{ui.trySampleButton}</span>
+            </button>
+            <button
+              type="button"
+              class="btn-pane-action"
+              id="btn-clear-paste"
+              aria-label={ui.clearButton}
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+              <span>{ui.clearButton}</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="pane-body">
+          <textarea
+            id="srt-paste-input"
+            class="editor-textarea"
+            placeholder={ui.pastePlaceholder}
+            aria-label={ui.pasteTitle}
+            rows="11"
+            spellcheck="false"
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- Right: Converted WebVTT Preview (.vtt) -->
+      <div class="editor-pane vtt-preview-pane">
+        <div class="pane-header">
+          <div class="pane-title-group">
+            <svg class="pane-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polygon points="5 3 19 12 5 21 5 3"/>
+            </svg>
+            <span class="pane-title">{ui.livePreviewTitle}</span>
+          </div>
+          <div class="pane-actions">
+            <button
+              type="button"
+              class="btn-pane-action"
+              id="btn-copy-live"
+              aria-label={ui.copyAction}
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+                <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+              </svg>
+              <span id="copy-live-text">{ui.copyAction}</span>
+            </button>
+            <button
+              type="button"
+              class="btn-pane-action btn-pane-primary"
+              id="btn-download-live"
+              aria-label={ui.downloadAction}
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              <span>{ui.downloadAction}</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="pane-body">
+          <textarea
+            id="vtt-live-preview"
+            class="editor-textarea preview-textarea"
+            readonly
+            placeholder={ui.previewEmpty}
+            aria-label={ui.livePreviewTitle}
+            rows="11"
+            spellcheck="false"
+          ></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- OR Divider -->
+    <div class="or-divider" aria-hidden="true">
+      <span class="or-line"></span>
+      <span class="or-badge">{ui.orDivider}</span>
+      <span class="or-line"></span>
+    </div>
+
+    <!-- Option 2: Upload SRT File Dropzone -->
+    <div class="option-block option-upload">
+      <div class="option-header">
+        <div class="option-title-group">
+          <span class="option-badge">2</span>
+          <span class="option-title">{ui.uploadTitle}</span>
+        </div>
+      </div>
+
+      <div
+        class="dropzone"
+        id="dropzone"
+        role="region"
+        aria-label={ui.dropzoneTitle}
+        tabindex="0"
+      >
+        <!-- Default Dropzone View -->
+        <div class="dropzone-inner" id="dropzone-default-view">
+          <div class="dropzone-icon" aria-hidden="true">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="17 8 12 3 7 8" />
+              <line x1="12" y1="3" x2="12" y2="15" />
+            </svg>
+          </div>
+
+          <p class="dropzone-title" id="dropzone-text">{ui.dropzoneTitle}</p>
+          <p class="dropzone-sub">{ui.dropzoneSubtitle}</p>
+
+          <button type="button" class="btn btn-secondary btn-browse" id="btn-browse">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/>
+            </svg>
+            <span>{ui.browseButton}</span>
+          </button>
+        </div>
+
+        <!-- File Attached View -->
+        <div class="file-attached-view" id="file-attached-view" style="display: none;">
+          <div class="attached-file-info">
+            <div class="attached-file-icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                <polyline points="14 2 14 8 20 8"/>
+              </svg>
+            </div>
+            <div class="attached-file-meta">
+              <span class="attached-file-name" id="attached-filename">-</span>
+              <span class="attached-file-size" id="attached-filesize">-</span>
+            </div>
+          </div>
+          <button type="button" class="btn-remove-file" id="btn-remove-file" aria-label="Remove attached file">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+
+        <input
+          type="file"
+          id="file-input"
+          accept=".srt,text/plain"
+          class="sr-only"
+          aria-label={ui.browseButton}
+        />
+      </div>
+    </div>
+
+    <!-- Conversion Options Bar -->
+    <div class="options-bar">
+      <span class="options-heading">{ui.optionsTitle}:</span>
+      <div class="options-group">
+        <label class="option-check">
+          <input type="checkbox" id="opt-cue-numbers" checked />
+          <span>{ui.optIncludeCueNumbers}</span>
+        </label>
+        <label class="option-check">
+          <input type="checkbox" id="opt-clean-tags" checked />
+          <span>{ui.optCleanTags}</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Convert Action Button -->
+    <div class="convert-action-wrap">
+      <button type="button" class="btn btn-primary btn-lg btn-convert" id="btn-convert">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="m9 18 6-6-6-6"/>
+        </svg>
+        <span>{ui.convertButton}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Error Alert -->
+  <div class="alert-error" id="error-box" role="alert" style="display: none;">
+    <svg class="alert-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="10" />
+      <line x1="12" y1="8" x2="12" y2="12" />
+      <line x1="12" y1="16" x2="12.01" y2="16" />
+    </svg>
+    <span id="error-message"></span>
+  </div>
+
+  <!-- File Summary & Results Panel (Shown after clicking Convert or on demand) -->
+  <div class="processing-panel" id="processing-panel" style="display: none;">
+    <div class="file-summary">
+      <div class="summary-item">
+        <span class="summary-label">{ui.fileNameLabel}</span>
+        <span class="summary-value" id="summary-filename">-</span>
+      </div>
+      <div class="summary-item">
+        <span class="summary-label">{ui.fileSizeLabel}</span>
+        <span class="summary-value" id="summary-filesize">-</span>
+      </div>
+      <div class="summary-item">
+        <span class="summary-label">{ui.cueCountLabel}</span>
+        <span class="summary-value" id="summary-cues">-</span>
+      </div>
+      <div class="summary-item">
+        <span class="summary-label">{ui.characterCountLabel}</span>
+        <span class="summary-value" id="summary-chars">-</span>
+      </div>
+    </div>
+
+    <div class="preview-header">
+      <h2 class="preview-title">{ui.previewTitle}</h2>
+    </div>
+
+    <textarea
+      id="preview-text"
+      class="preview-textarea full-preview"
+      readonly
+      rows="12"
+      aria-label={ui.previewTitle}
+      spellcheck="false"
+    ></textarea>
+
+    <!-- Action Buttons Row -->
+    <div class="action-buttons-group">
+      <button type="button" class="btn btn-primary btn-lg" id="btn-download">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="7 10 12 15 17 10" />
+          <line x1="12" y1="15" x2="12" y2="3" />
+        </svg>
+        <span>{ui.downloadAction}</span>
+      </button>
+
+      <button type="button" class="btn btn-secondary btn-lg" id="btn-copy">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+          <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+        </svg>
+        <span id="copy-btn-text">{ui.copyAction}</span>
+      </button>
+
+      <button type="button" class="btn btn-ghost" id="btn-reset">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+          <path d="M3 3v5h5" />
+        </svg>
+        <span>{ui.resetAction}</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .converter-card {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    padding: 1.75rem;
+    margin-block-end: 2.5rem;
+    box-shadow: 0 4px 16px -2px var(--shadow-color, rgba(0, 0, 0, 0.05));
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .input-section {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  /* 2-Column Editor Grid */
+  .editor-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .editor-pane {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg-surface-elevated);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    transition: border-color 0.15s ease;
+  }
+
+  .editor-pane:focus-within {
+    border-color: var(--border-focus);
+  }
+
+  .pane-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.625rem 0.875rem;
+    background-color: var(--bg-surface-hover);
+    border-bottom: 1px solid var(--border-subtle);
+    gap: 0.5rem;
+  }
+
+  .pane-title-group {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-width: 0;
+  }
+
+  .pane-icon {
+    color: var(--text-primary);
+    flex-shrink: 0;
+  }
+
+  .pane-title {
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .pane-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-shrink: 0;
+  }
+
+  .btn-pane-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.25rem 0.55rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+
+  .btn-pane-action:hover {
+    color: var(--text-primary);
+    background-color: var(--bg-surface-elevated);
+    border-color: var(--border-focus);
+  }
+
+  .btn-pane-primary {
+    background-color: var(--text-primary);
+    color: var(--bg-app);
+    border-color: var(--text-primary);
+  }
+
+  .btn-pane-primary:hover {
+    opacity: 0.9;
+    color: var(--bg-app);
+  }
+
+  .pane-body {
+    display: flex;
+    flex: 1;
+    min-height: 220px;
+  }
+
+  .editor-textarea {
+    width: 100%;
+    min-height: 220px;
+    padding: 0.875rem 1rem;
+    border: none;
+    background: transparent;
+    color: var(--text-primary);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    resize: vertical;
+    outline: none;
+    box-sizing: border-box;
+  }
+
+  .editor-textarea::placeholder {
+    color: var(--text-muted);
+    opacity: 0.8;
+  }
+
+  .preview-textarea {
+    background-color: var(--bg-surface-elevated);
+  }
+
+  /* OR Divider */
+  .or-divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 1.75rem 0;
+    user-select: none;
+  }
+
+  .or-line {
+    flex: 1;
+    height: 1px;
+    background-color: var(--border-subtle);
+  }
+
+  .or-badge {
+    padding: 0.2rem 0.75rem;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--border-default);
+    background-color: var(--bg-surface-elevated);
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  /* Option 2: Upload Block */
+  .option-block {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .option-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.625rem;
+  }
+
+  .option-title-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .option-badge {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background-color: var(--text-primary);
+    color: var(--bg-app);
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .option-title {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
+  }
+
+  /* Dropzone */
+  .dropzone {
+    border: 2px dashed var(--border-strong);
+    border-radius: var(--radius-md);
+    padding: 1.75rem 1.25rem;
+    text-align: center;
+    background-color: var(--bg-surface-elevated);
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+
+  .dropzone:hover,
+  .dropzone.dragover {
+    border-color: var(--border-focus);
+    background-color: var(--bg-surface-hover);
+  }
+
+  .dropzone-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .dropzone-icon {
+    color: var(--text-primary);
+  }
+
+  .dropzone-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  .dropzone-sub {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    margin: 0;
+  }
+
+  .btn-browse {
+    margin-top: 0.35rem;
+    font-size: 0.84rem;
+    padding: 0.4rem 0.875rem;
+  }
+
+  /* File Attached View */
+  .file-attached-view {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0.75rem;
+    background-color: var(--bg-surface-hover);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    gap: 0.75rem;
+  }
+
+  .attached-file-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 0;
+    text-align: start;
+  }
+
+  .attached-file-icon {
+    color: var(--text-primary);
+    flex-shrink: 0;
+  }
+
+  .attached-file-meta {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .attached-file-name {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .attached-file-size {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  .btn-remove-file {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: var(--radius-sm);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .btn-remove-file:hover {
+    color: var(--text-primary);
+    background-color: var(--bg-surface);
+  }
+
+  /* Options Bar */
+  .options-bar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    padding: 0.875rem 1.125rem;
+    background-color: var(--bg-surface-elevated);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+  }
+
+  .options-heading {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .options-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+  }
+
+  .option-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .option-check input {
+    cursor: pointer;
+  }
+
+  /* Convert Action Button */
+  .convert-action-wrap {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  .btn-convert {
+    min-width: 240px;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.05rem;
+    padding-block: 0.875rem;
+  }
+
+  /* Alert Error */
+  .alert-error {
+    margin-top: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1.125rem;
+    background-color: var(--bg-error-subtle, rgba(239, 68, 68, 0.1));
+    border: 1px solid var(--border-error, rgba(239, 68, 68, 0.3));
+    border-radius: var(--radius-md);
+    color: var(--text-error, #ef4444);
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .alert-icon {
+    flex-shrink: 0;
+  }
+
+  /* Processing / Result Panel */
+  .processing-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    width: 100%;
+  }
+
+  .file-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
+    padding: 1.125rem;
+    background-color: var(--bg-surface-elevated);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+  }
+
+  .summary-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .summary-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+  }
+
+  .summary-value {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .preview-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .preview-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-primary);
+  }
+
+  .full-preview {
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+  }
+
+  .action-buttons-group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.875rem;
+  }
+
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .converter-card {
+      padding: 1.25rem;
+    }
+
+    .editor-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .btn-convert {
+      width: 100%;
+    }
+
+    .action-buttons-group {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .action-buttons-group button {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    const root = document.getElementById('converter-root');
+    if (!root) return;
+
+    // Elements
+    const pasteInput = document.getElementById('srt-paste-input');
+    const livePreview = document.getElementById('vtt-live-preview');
+    const btnSample = document.getElementById('btn-sample');
+    const btnClearPaste = document.getElementById('btn-clear-paste');
+    const btnCopyLive = document.getElementById('btn-copy-live');
+    const copyLiveText = document.getElementById('copy-live-text');
+    const btnDownloadLive = document.getElementById('btn-download-live');
+
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('file-input');
+    const btnBrowse = document.getElementById('btn-browse');
+    const dropzoneDefaultView = document.getElementById('dropzone-default-view');
+    const fileAttachedView = document.getElementById('file-attached-view');
+    const attachedFilename = document.getElementById('attached-filename');
+    const attachedFilesize = document.getElementById('attached-filesize');
+    const btnRemoveFile = document.getElementById('btn-remove-file');
+
+    const optCueNumbers = document.getElementById('opt-cue-numbers');
+    const optCleanTags = document.getElementById('opt-clean-tags');
+    const btnConvert = document.getElementById('btn-convert');
+
+    const inputSection = document.getElementById('input-section');
+    const errorBox = document.getElementById('error-box');
+    const errorMessage = document.getElementById('error-message');
+    const processingPanel = document.getElementById('processing-panel');
+    const previewText = document.getElementById('preview-text');
+    const btnDownload = document.getElementById('btn-download');
+    const btnCopy = document.getElementById('btn-copy');
+    const copyBtnText = document.getElementById('copy-btn-text');
+    const btnReset = document.getElementById('btn-reset');
+
+    const summaryFilename = document.getElementById('summary-filename');
+    const summaryFilesize = document.getElementById('summary-filesize');
+    const summaryCues = document.getElementById('summary-cues');
+    const summaryChars = document.getElementById('summary-chars');
+
+    const SAMPLE_SRT = `1\n00:00:01,000 --> 00:00:04,000\nWelcome to our video tutorial!\n\n2\n00:00:04,500 --> 00:00:08,200\nToday we will learn how to use WebVTT subtitles with HTML5 video.\n\n3\n00:00:08,800 --> 00:00:12,500\nWebVTT provides seamless playback across modern web browsers.`;
+
+    let selectedFile = null;
+    let selectedFileText = '';
+    let currentFileName = 'subtitles.vtt';
+    const originalCopyText = copyLiveText ? copyLiveText.textContent : 'Copy to Clipboard';
+
+    function showError(msg) {
+      if (errorMessage && errorBox) {
+        errorMessage.textContent = msg;
+        errorBox.style.display = 'flex';
+      }
+    }
+
+    function clearError() {
+      if (errorBox && errorMessage) {
+        errorBox.style.display = 'none';
+        errorMessage.textContent = '';
+      }
+    }
+
+    function formatFileSize(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+    }
+
+    // Core SRT to WebVTT parsing and conversion function
+    function convertSrtToVtt(rawContent, options) {
+      const opts = options || {
+        includeCueNumbers: optCueNumbers ? optCueNumbers.checked : true,
+        cleanTags: optCleanTags ? optCleanTags.checked : true,
+      };
+
+      if (!rawContent || !rawContent.trim()) {
+        return { success: false, error: 'empty' };
+      }
+
+      const normalized = rawContent
+        .replace(/^\uFEFF/, '') // strip UTF-8 BOM
+        .replace(/\r\n/g, '\n')
+        .replace(/\r/g, '\n');
+
+      const blocks = normalized.trim().split(/\n\s*\n+/);
+      const vttCues = [];
+      const timestampRegex = /(\d{1,2}:\d{2}:\d{2})([,\.])(\d{1,3})\s*-->\s*(\d{1,2}:\d{2}:\d{2})([,\.])(\d{1,3})/;
+
+      let cueIndex = 1;
+      for (let i = 0; i < blocks.length; i++) {
+        const lines = blocks[i].trim().split('\n');
+        if (lines.length === 0 || (lines.length === 1 && !lines[0].trim())) {
+          continue;
+        }
+
+        if (lines[0].trim().toUpperCase() === 'WEBVTT' || lines[0].trim().startsWith('NOTE')) {
+          continue;
+        }
+
+        let timeLineIndex = -1;
+        for (let j = 0; j < lines.length; j++) {
+          if (timestampRegex.test(lines[j].trim())) {
+            timeLineIndex = j;
+            break;
+          }
+        }
+
+        if (timeLineIndex === -1) {
+          continue;
+        }
+
+        let identifier = '';
+        if (timeLineIndex > 0) {
+          identifier = lines.slice(0, timeLineIndex).join(' ').trim();
+        } else {
+          identifier = String(cueIndex);
+        }
+
+        // Convert timestamps: comma to period, pad milliseconds to 3 digits
+        const timeLine = lines[timeLineIndex].trim().replace(
+          /(\d{1,2}:\d{2}:\d{2})[,\.](\d{1,3})\s*-->\s*(\d{1,2}:\d{2}:\d{2})[,\.](\d{1,3})/,
+          function (_, hms1, ms1, hms2, ms2) {
+            const padMs1 = ms1.padEnd(3, '0').slice(0, 3);
+            const padMs2 = ms2.padEnd(3, '0').slice(0, 3);
+            const padHms1 = hms1.length === 7 ? '0' + hms1 : hms1;
+            const padHms2 = hms2.length === 7 ? '0' + hms2 : hms2;
+            return padHms1 + '.' + padMs1 + ' --> ' + padHms2 + '.' + padMs2;
+          }
+        );
+
+        let dialogueLines = lines.slice(timeLineIndex + 1);
+        let dialogue = dialogueLines.join('\n').trim();
+
+        if (opts.cleanTags) {
+          dialogue = dialogue.replace(/<\/?font[^>]*>/gi, '');
+        }
+
+        if (dialogue) {
+          vttCues.push({
+            id: identifier,
+            timing: timeLine,
+            text: dialogue,
+          });
+          cueIndex++;
+        }
+      }
+
+      if (vttCues.length === 0) {
+        return { success: false, error: 'no_cues' };
+      }
+
+      const vttBlocks = ['WEBVTT\n'];
+      for (let i = 0; i < vttCues.length; i++) {
+        const cue = vttCues[i];
+        let block = '';
+        if (opts.includeCueNumbers && cue.id) {
+          block += cue.id + '\n';
+        }
+        block += cue.timing + '\n' + cue.text;
+        vttBlocks.push(block);
+      }
+
+      const finalVtt = vttBlocks.join('\n');
+      return {
+        success: true,
+        vtt: finalVtt,
+        cueCount: vttCues.length,
+        charCount: finalVtt.length,
+      };
+    }
+
+    function updateLivePreview() {
+      if (!pasteInput || !livePreview) return;
+      const raw = pasteInput.value;
+      if (!raw.trim()) {
+        livePreview.value = '';
+        return;
+      }
+
+      const result = convertSrtToVtt(raw);
+      if (result.success) {
+        livePreview.value = result.vtt;
+      }
+    }
+
+    function attachFile(file) {
+      clearError();
+      if (!file) return;
+
+      const name = file.name || 'subtitles.srt';
+      const ext = name.toLowerCase().split('.').pop();
+      if (ext !== 'srt' && ext !== 'txt' && !file.type.includes('text')) {
+        showError('Please upload a valid .srt subtitle file.');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        selectedFile = file;
+        selectedFileText = e.target.result;
+        currentFileName = name.replace(/\.[^/.]+$/, '') + '.vtt';
+
+        if (attachedFilename) attachedFilename.textContent = file.name;
+        if (attachedFilesize) attachedFilesize.textContent = formatFileSize(file.size);
+
+        if (dropzoneDefaultView) dropzoneDefaultView.style.display = 'none';
+        if (fileAttachedView) fileAttachedView.style.display = 'flex';
+
+        if (pasteInput) {
+          pasteInput.value = selectedFileText;
+          updateLivePreview();
+        }
+      };
+
+      reader.onerror = function () {
+        showError('Failed to read file contents.');
+      };
+
+      reader.readAsText(file, 'utf-8');
+    }
+
+    function detachFile() {
+      selectedFile = null;
+      selectedFileText = '';
+      if (fileInput) fileInput.value = '';
+      if (fileAttachedView) fileAttachedView.style.display = 'none';
+      if (dropzoneDefaultView) dropzoneDefaultView.style.display = 'flex';
+    }
+
+    function doConvert() {
+      clearError();
+      let textToProcess = '';
+      let sourceName = '';
+      let sourceSize = '';
+
+      if (selectedFile && selectedFileText) {
+        textToProcess = selectedFileText;
+        sourceName = selectedFile.name;
+        sourceSize = formatFileSize(selectedFile.size);
+      } else if (pasteInput && pasteInput.value.trim().length > 0) {
+        textToProcess = pasteInput.value;
+        sourceName = 'Pasted SRT Content';
+        const byteLen = new Blob([pasteInput.value]).size;
+        sourceSize = formatFileSize(byteLen);
+      } else {
+        showError('Please paste SRT subtitle text or upload an .srt file to convert.');
+        return;
+      }
+
+      const result = convertSrtToVtt(textToProcess);
+      if (!result.success) {
+        if (result.error === 'empty') {
+          showError('The provided file or input is completely empty.');
+        } else {
+          showError('Failed to detect valid SRT subtitle cues. Ensure timestamps follow 00:00:00,000 --> 00:00:00,000.');
+        }
+        return;
+      }
+
+      if (summaryFilename) summaryFilename.textContent = sourceName;
+      if (summaryFilesize) summaryFilesize.textContent = sourceSize;
+      if (summaryCues) summaryCues.textContent = result.cueCount.toLocaleString();
+      if (summaryChars) summaryChars.textContent = result.charCount.toLocaleString();
+
+      if (previewText) previewText.value = result.vtt;
+
+      if (inputSection) inputSection.style.display = 'none';
+      if (processingPanel) processingPanel.style.display = 'flex';
+
+      root.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    // Event listeners
+    if (pasteInput) {
+      pasteInput.addEventListener('input', function () {
+        clearError();
+        updateLivePreview();
+        if (selectedFile && pasteInput.value !== selectedFileText) {
+          detachFile();
+        }
+      });
+    }
+
+    if (btnSample) {
+      btnSample.addEventListener('click', function () {
+        clearError();
+        if (selectedFile) detachFile();
+        pasteInput.value = SAMPLE_SRT;
+        updateLivePreview();
+        pasteInput.focus();
+      });
+    }
+
+    if (btnClearPaste) {
+      btnClearPaste.addEventListener('click', function () {
+        if (pasteInput) pasteInput.value = '';
+        if (livePreview) livePreview.value = '';
+        if (selectedFile) detachFile();
+        clearError();
+        if (pasteInput) pasteInput.focus();
+      });
+    }
+
+    // Live preview copy
+    if (btnCopyLive) {
+      btnCopyLive.addEventListener('click', function () {
+        const text = livePreview ? livePreview.value : '';
+        if (!text) return;
+        navigator.clipboard.writeText(text).then(function () {
+          if (copyLiveText) copyLiveText.textContent = 'Copied!';
+          setTimeout(function () {
+            if (copyLiveText) copyLiveText.textContent = originalCopyText;
+          }, 2000);
+        });
+      });
+    }
+
+    // Live preview download
+    if (btnDownloadLive) {
+      btnDownloadLive.addEventListener('click', function () {
+        const text = livePreview ? livePreview.value : '';
+        if (!text) return;
+        const blob = new Blob([text], { type: 'text/vtt;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = currentFileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      });
+    }
+
+    // Results download
+    if (btnDownload) {
+      btnDownload.addEventListener('click', function () {
+        const text = previewText ? previewText.value : '';
+        if (!text) return;
+        const blob = new Blob([text], { type: 'text/vtt;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = currentFileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      });
+    }
+
+    // Results copy
+    if (btnCopy) {
+      btnCopy.addEventListener('click', function () {
+        const text = previewText ? previewText.value : '';
+        if (!text) return;
+        navigator.clipboard.writeText(text).then(function () {
+          if (copyBtnText) copyBtnText.textContent = 'Copied!';
+          setTimeout(function () {
+            if (copyBtnText) copyBtnText.textContent = originalCopyText;
+          }, 2000);
+        });
+      });
+    }
+
+    // Reset button
+    if (btnReset) {
+      btnReset.addEventListener('click', function () {
+        detachFile();
+        if (pasteInput) pasteInput.value = '';
+        if (livePreview) livePreview.value = '';
+        if (previewText) previewText.value = '';
+        clearError();
+        if (processingPanel) processingPanel.style.display = 'none';
+        if (inputSection) inputSection.style.display = 'flex';
+        root.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
+    }
+
+    // File selection
+    if (btnBrowse && fileInput) {
+      btnBrowse.addEventListener('click', function (e) {
+        e.stopPropagation();
+        fileInput.click();
+      });
+    }
+
+    if (dropzone && fileInput) {
+      dropzone.addEventListener('click', function (e) {
+        if (e.target.closest('#btn-remove-file')) return;
+        if (!selectedFile) fileInput.click();
+      });
+
+      dropzone.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          if (e.target.closest('#btn-remove-file')) return;
+          if (!selectedFile) {
+            e.preventDefault();
+            fileInput.click();
+          }
+        }
+      });
+
+      ['dragenter', 'dragover'].forEach(function (eventName) {
+        dropzone.addEventListener(eventName, function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          dropzone.classList.add('dragover');
+        });
+      });
+
+      ['dragleave', 'drop'].forEach(function (eventName) {
+        dropzone.addEventListener(eventName, function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          dropzone.classList.remove('dragover');
+        });
+      });
+
+      dropzone.addEventListener('drop', function (e) {
+        const dt = e.dataTransfer;
+        if (dt && dt.files && dt.files[0]) {
+          attachFile(dt.files[0]);
+        }
+      });
+    }
+
+    if (fileInput) {
+      fileInput.addEventListener('change', function (e) {
+        if (e.target.files && e.target.files[0]) {
+          attachFile(e.target.files[0]);
+        }
+      });
+    }
+
+    if (btnRemoveFile) {
+      btnRemoveFile.addEventListener('click', function (e) {
+        e.stopPropagation();
+        detachFile();
+      });
+    }
+
+    // Options
+    if (optCueNumbers) optCueNumbers.addEventListener('change', updateLivePreview);
+    if (optCleanTags) optCleanTags.addEventListener('change', updateLivePreview);
+
+    // Convert button
+    if (btnConvert) {
+      btnConvert.addEventListener('click', doConvert);
+    }
+  })();
+</script>

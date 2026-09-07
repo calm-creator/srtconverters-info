@@ -2,6 +2,7 @@ import type { Locale } from '../i18n/locales';
 import { TOOL_ROUTES, getToolPath } from '../i18n/routes';
 import { srtToTxtData } from './tools/srt-to-txt';
 import { txtToSrtData } from './tools/txt-to-srt';
+import { srtToVttData } from './tools/srt-to-vtt';
 
 export interface ToolSummary {
   id: string;
@@ -67,6 +68,34 @@ export const TOOLS_REGISTRY: Record<string, ToolSummary> = {
     },
     icon: 'srt-file',
   },
+  'srt-to-vtt': {
+    id: 'srt-to-vtt',
+    name: {
+      en: 'SRT to VTT Converter',
+      pt: 'Conversor SRT para VTT',
+      es: 'Convertidor SRT a VTT',
+      ko: 'SRT VTT 변환기',
+      vi: 'Chuyển đổi SRT sang VTT',
+      id: 'Konverter SRT ke VTT',
+      ja: 'SRT VTT 変換ツール',
+      fr: 'Convertisseur SRT en VTT',
+      de: 'SRT in VTT Umwandler',
+      ar: 'محول SRT إلى VTT',
+    },
+    shortDescription: {
+      en: 'Convert SRT subtitles to WebVTT (.vtt) format for HTML5 video, streaming, and modern players. 100% private in-browser tool.',
+      pt: 'Converta legendas SRT para o formato WebVTT (.vtt) compatível com vídeo HTML5 e streaming. Totalmente seguro no navegador.',
+      es: 'Convierta subtítulos SRT a formato WebVTT (.vtt) para vídeo HTML5 y streaming con total privacidad en su navegador.',
+      ko: 'SRT 자막을 HTML5 동영상 및 스트리밍에 최적화된 표준 WebVTT(.vtt)로 변환합니다. 100% 브라우저 내 보안 처리.',
+      vi: 'Chuyển đổi phụ đề SRT sang định dạng WebVTT (.vtt) chuẩn cho video HTML5 và streaming. Hoạt động 100% trên trình duyệt.',
+      id: 'Ubah subtitle SRT ke format WebVTT (.vtt) untuk video HTML5 dan streaming. 100% privat dan aman di browser.',
+      ja: 'SRT字幕をHTML5動画やWeb配信に最適な標準WebVTT（.vtt）形式に変換。ブラウザ完結で安全・高速です。',
+      fr: 'Convertissez des sous-titres SRT au format WebVTT (.vtt) pour la vidéo HTML5 et le streaming. 100% confidentiel dans le navigateur.',
+      de: 'Wandeln Sie SRT-Untertitel in das WebVTT-Format (.vtt) für HTML5-Videos und Streaming um. 100% datenschutzfreundlich.',
+      ar: 'تحويل ملفات ترجمة SRT إلى صيغة WebVTT القياسية لمشغلات فيديو HTML5 والويب. مجاني وآمن 100% داخل المتصفح.',
+    },
+    icon: 'vtt-file',
+  },
 };
 
 export function getAllTools(): ToolSummary[] {
@@ -79,6 +108,9 @@ export function getToolData(toolId: string, locale: Locale) {
   }
   if (toolId === 'txt-to-srt') {
     return txtToSrtData[locale] || txtToSrtData.en;
+  }
+  if (toolId === 'srt-to-vtt') {
+    return srtToVttData[locale] || srtToVttData.en;
   }
   return null;
 }

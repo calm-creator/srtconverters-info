@@ -9,7 +9,7 @@
     "preview": "astro preview",
     "astro": "astro",
     "validate": "node scripts/validate-routes.mjs",
-    "test": "node scripts/test-converter.mjs && node scripts/validate-routes.mjs && node scripts/audit-mobile-html.mjs && node scripts/verify-txt-to-srt-localization.mjs"
+    "test": "node scripts/test-converter.mjs && node scripts/validate-routes.mjs && node scripts/audit-mobile-html.mjs && node scripts/verify-txt-to-srt-localization.mjs && node scripts/verify-srt-to-vtt.mjs && node scripts/verify-all-srt-to-vtt-locales.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.2.1",

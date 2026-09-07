@@ -38,6 +38,21 @@ export const TOOL_ROUTES: Record<string, ToolRouteConfig> = {
       ar: 'محول-txt-إلى-srt',
     },
   },
+  'srt-to-vtt': {
+    id: 'srt-to-vtt',
+    slugs: {
+      en: 'srt-to-vtt',
+      pt: 'conversor-srt-para-vtt',
+      es: 'convertidor-srt-a-vtt',
+      ko: 'srt-vtt-변환기',
+      vi: 'chuyen-srt-sang-vtt',
+      id: 'konverter-srt-ke-vtt',
+      ja: 'srt-vtt-変換',
+      fr: 'convertisseur-srt-en-vtt',
+      de: 'srt-in-vtt-umwandeln',
+      ar: 'محول-srt-إلى-vtt',
+    },
+  },
 };
 
 export const PAGE_ROUTES = {

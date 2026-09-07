@@ -248,6 +248,153 @@ assert.strictEqual(res12.success, true);
 assert.strictEqual(res12.srt, preSrt);
 console.log('✓ Test 12: Recognizable pre-timed SRT text preserved without re-wrapping.');
 
-console.log('\n✓ All 12 Converter unit tests PASSED successfully!\n');
+console.log('\n--- Testing SRT to VTT Conversion Logic ---');
+
+function convertSrtToVtt(rawContent, options = { includeCueNumbers: true, cleanTags: true }) {
+  if (!rawContent || !rawContent.trim()) {
+    return { success: false, error: 'empty' };
+  }
+
+  const normalized = rawContent
+    .replace(/^\uFEFF/, '') // strip UTF-8 BOM
+    .replace(/\r\n/g, '\n')
+    .replace(/\r/g, '\n');
+
+  const blocks = normalized.trim().split(/\n\s*\n+/);
+  const vttCues = [];
+  const timestampRegex = /(\d{1,2}:\d{2}:\d{2})([,\.])(\d{1,3})\s*-->\s*(\d{1,2}:\d{2}:\d{2})([,\.])(\d{1,3})/;
+
+  let cueIndex = 1;
+  for (let i = 0; i < blocks.length; i++) {
+    const lines = blocks[i].trim().split('\n');
+    if (lines.length === 0 || (lines.length === 1 && !lines[0].trim())) {
+      continue;
+    }
+
+    if (lines[0].trim().toUpperCase() === 'WEBVTT' || lines[0].trim().startsWith('NOTE')) {
+      continue;
+    }
+
+    let timeLineIndex = -1;
+    for (let j = 0; j < lines.length; j++) {
+      if (timestampRegex.test(lines[j].trim())) {
+        timeLineIndex = j;
+        break;
+      }
+    }
+
+    if (timeLineIndex === -1) {
+      continue;
+    }
+
+    let identifier = '';
+    if (timeLineIndex > 0) {
+      identifier = lines.slice(0, timeLineIndex).join(' ').trim();
+    } else {
+      identifier = String(cueIndex);
+    }
+
+    const timeLine = lines[timeLineIndex].trim().replace(
+      /(\d{1,2}:\d{2}:\d{2})[,\.](\d{1,3})\s*-->\s*(\d{1,2}:\d{2}:\d{2})[,\.](\d{1,3})/,
+      (_, hms1, ms1, hms2, ms2) => {
+        const padMs1 = ms1.padEnd(3, '0').slice(0, 3);
+        const padMs2 = ms2.padEnd(3, '0').slice(0, 3);
+        const padHms1 = hms1.length === 7 ? '0' + hms1 : hms1;
+        const padHms2 = hms2.length === 7 ? '0' + hms2 : hms2;
+        return `${padHms1}.${padMs1} --> ${padHms2}.${padMs2}`;
+      }
+    );
+
+    let dialogueLines = lines.slice(timeLineIndex + 1);
+    let dialogue = dialogueLines.join('\n').trim();
+
+    if (options.cleanTags) {
+      dialogue = dialogue.replace(/<\/?font[^>]*>/gi, '');
+    }
+
+    if (dialogue) {
+      vttCues.push({
+        id: identifier,
+        timing: timeLine,
+        text: dialogue,
+      });
+      cueIndex++;
+    }
+  }
+
+  if (vttCues.length === 0) {
+    return { success: false, error: 'no_cues' };
+  }
+
+  const vttBlocks = ['WEBVTT\n'];
+  for (let i = 0; i < vttCues.length; i++) {
+    const cue = vttCues[i];
+    let block = '';
+    if (options.includeCueNumbers && cue.id) {
+      block += `${cue.id}\n`;
+    }
+    block += `${cue.timing}\n${cue.text}`;
+    vttBlocks.push(block);
+  }
+
+  const finalVtt = vttBlocks.join('\n');
+  return {
+    success: true,
+    vtt: finalVtt,
+    cueCount: vttCues.length,
+    charCount: finalVtt.length,
+  };
+}
+
+// Test 13: Standard SRT to VTT with comma-to-period timestamp conversion and WEBVTT header
+const srtSample1 = `1\r\n00:00:01,000 --> 00:00:04,000\r\nHello, world!\r\n\r\n2\r\n00:00:05,250 --> 00:00:08,750\r\nSecond subtitle line.`;
+const res13 = convertSrtToVtt(srtSample1);
+assert.strictEqual(res13.success, true);
+assert.strictEqual(res13.cueCount, 2);
+assert(res13.vtt.startsWith('WEBVTT\n'));
+assert(res13.vtt.includes('00:00:01.000 --> 00:00:04.000'));
+assert(res13.vtt.includes('00:00:05.250 --> 00:00:08.750'));
+assert(res13.vtt.includes('Hello, world!'));
+console.log('✓ Test 13: WEBVTT header added and commas converted to periods.');
+
+// Test 14: Multi-line subtitles & cue identifiers
+const srtSample2 = `10\n00:01:23,450 --> 00:01:26,780\nSpeaker 1: First line.\nSpeaker 1: Second line.`;
+const res14 = convertSrtToVtt(srtSample2, { includeCueNumbers: true, cleanTags: true });
+assert.strictEqual(res14.success, true);
+assert(res14.vtt.includes('10\n00:01:23.450 --> 00:01:26.780\nSpeaker 1: First line.\nSpeaker 1: Second line.'));
+console.log('✓ Test 14: Multi-line dialogues and cue numbers preserved.');
+
+// Test 15: Legacy font tags stripped while preserving valid formatting
+const srtSample3 = `1\n00:00:02,000 --> 00:00:05,000\n<font color="#ff0000"><i>Important notice</i></font>`;
+const res15 = convertSrtToVtt(srtSample3, { includeCueNumbers: false, cleanTags: true });
+assert.strictEqual(res15.success, true);
+assert(res15.vtt.includes('00:00:02.000 --> 00:00:05.000\n<i>Important notice</i>'));
+assert(!res15.vtt.includes('<font'));
+console.log('✓ Test 15: Legacy font tags cleaned, valid italic tags preserved.');
+
+// Test 16: Multilingual Unicode & RTL (Arabic, Korean, Japanese, Vietnamese, German)
+const srtSample4 = `1\n00:00:01,000 --> 00:00:03,000\n안녕하세요 (Korean)\n\n2\n00:00:04,000 --> 00:00:06,000\nこんにちは (Japanese)\n\n3\n00:00:07,000 --> 00:00:09,000\nمرحباً بكم (Arabic RTL)\n\n4\n00:00:10,000 --> 00:00:12,000\nXin chào các bạn (Vietnamese)\n\n5\n00:00:13,000 --> 00:00:15,000\nGrüße, Äpfel und Überraschung (German Umlauts)`;
+const res16 = convertSrtToVtt(srtSample4);
+assert.strictEqual(res16.success, true);
+assert.strictEqual(res16.cueCount, 5);
+assert(res16.vtt.includes('안녕하세요 (Korean)'));
+assert(res16.vtt.includes('こんにちは (Japanese)'));
+assert(res16.vtt.includes('مرحباً بكم (Arabic RTL)'));
+assert(res16.vtt.includes('Xin chào các bạn (Vietnamese)'));
+assert(res16.vtt.includes('Grüße, Äpfel und Überraschung (German Umlauts)'));
+console.log('✓ Test 16: Multilingual and RTL Unicode characters converted flawlessly.');
+
+// Test 17: Empty input & invalid format error handling
+const res17Empty = convertSrtToVtt('');
+assert.strictEqual(res17Empty.success, false);
+assert.strictEqual(res17Empty.error, 'empty');
+
+const res17Invalid = convertSrtToVtt('Just plain text without timestamps');
+assert.strictEqual(res17Invalid.success, false);
+assert.strictEqual(res17Invalid.error, 'no_cues');
+console.log('✓ Test 17: Empty and non-subtitle inputs handled gracefully with error states.');
+
+console.log('\n✓ All 17 Converter unit tests PASSED successfully!\n');
+
 
 

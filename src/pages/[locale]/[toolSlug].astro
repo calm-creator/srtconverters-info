@@ -5,6 +5,7 @@ import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import FAQSection from '../../components/FAQSection.astro';
 import SrtToTxtTool from '../../components/converter/SrtToTxtTool.astro';
 import TxtToSrtTool from '../../components/converter/TxtToSrtTool.astro';
+import SrtToVttTool from '../../components/converter/SrtToVttTool.astro';
 import { LOCALES, DEFAULT_LOCALE, type Locale } from '../../i18n/locales';
 import { TOOL_ROUTES, getToolPath, getHomePath, getPagePath } from '../../i18n/routes';
 import { getToolData } from '../../data/tools';
@@ -93,6 +94,9 @@ const breadcrumbs = [
     {toolId === 'txt-to-srt' && (
       <TxtToSrtTool content={toolData as any} locale={locale} />
     )}
+    {toolId === 'srt-to-vtt' && (
+      <SrtToVttTool content={toolData as any} locale={locale} />
+    )}
 
     <!-- Explanatory Content & Guide Sections -->
     <article class="tool-content-article">
@@ -131,11 +135,31 @@ const breadcrumbs = [
         </section>
       )}
 
+      <!-- What is WebVTT (if present) -->
+      {(toolData.sections as any).whatIsVtt && (
+        <section class="content-section">
+          <h2>{(toolData.sections as any).whatIsVtt.title}</h2>
+          {(toolData.sections as any).whatIsVtt.content.map((p: string) => (
+            <p class="text-block">{p}</p>
+          ))}
+        </section>
+      )}
+
       <!-- What is Converter -->
       {toolData.sections.whatIsConverter && (
         <section class="content-section">
           <h2>{toolData.sections.whatIsConverter.title}</h2>
           {toolData.sections.whatIsConverter.content.map((p) => (
+            <p class="text-block">{p}</p>
+          ))}
+        </section>
+      )}
+
+      <!-- SRT vs VTT Key Differences (if present) -->
+      {(toolData.sections as any).srtVsVtt && (
+        <section class="content-section">
+          <h2>{(toolData.sections as any).srtVsVtt.title}</h2>
+          {(toolData.sections as any).srtVsVtt.content.map((p: string) => (
             <p class="text-block">{p}</p>
           ))}
         </section>
@@ -200,6 +224,27 @@ const breadcrumbs = [
               <div class="step-card">
                 <h3 class="step-title">{item.title}</h3>
                 <p class="step-desc">{item.description}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <!-- How VTT is used with HTML5 Video (if present) -->
+      {(toolData.sections as any).html5VideoGuide && (
+        <section class="content-section">
+          <h2>{(toolData.sections as any).html5VideoGuide.title}</h2>
+          <p class="text-block">{(toolData.sections as any).html5VideoGuide.description}</p>
+          
+          <div class="code-snippet-wrap">
+            <pre class="code-block"><code>{(toolData.sections as any).html5VideoGuide.codeSnippet}</code></pre>
+          </div>
+
+          <div class="explanation-grid">
+            {(toolData.sections as any).html5VideoGuide.explanation.map((item: any) => (
+              <div class="explanation-card">
+                <code class="param-name">{item.term}</code>
+                <p class="param-desc">{item.description}</p>
               </div>
             ))}
           </div>
@@ -408,6 +453,58 @@ const breadcrumbs = [
 
   .comparison-table td {
     color: var(--text-secondary);
+  }
+
+  /* Code Snippet Wrap */
+  .code-snippet-wrap {
+    margin-block: 1.25rem;
+    border-radius: var(--radius-md);
+    background-color: var(--bg-surface-elevated);
+    border: 1px solid var(--border-default);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .code-block {
+    margin: 0;
+    padding: 1.25rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--text-primary);
+  }
+
+  .explanation-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+    margin-block-start: 1.25rem;
+  }
+
+  .explanation-card {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 1.25rem;
+  }
+
+  .param-name {
+    display: inline-block;
+    font-weight: 700;
+    font-size: 0.875rem;
+    background-color: var(--bg-surface-elevated);
+    padding: 0.2rem 0.5rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-subtle);
+    margin-block-end: 0.5rem;
+    color: var(--text-primary);
+  }
+
+  .param-desc {
+    font-size: 0.9rem;
+    line-height: 1.55;
+    color: var(--text-secondary);
+    margin: 0;
   }
 
   /* Privacy highlight card */

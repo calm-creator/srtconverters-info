@@ -16,6 +16,8 @@ const samplePages = [
   'fr/tools/index.html',
   'srt-to-txt/index.html',
   'txt-to-srt/index.html',
+  'srt-to-vtt/index.html',
+  'fr/convertisseur-srt-en-vtt/index.html',
   'privacy/index.html',
   'terms/index.html',
   'about/index.html',
@@ -26,12 +28,16 @@ const samplePages = [
   'fr/convertisseur-txt-en-srt/index.html',
   'ar/محول-srt-إلى-txt/index.html',
   'ar/محول-txt-إلى-srt/index.html',
+  'ar/محول-srt-إلى-vtt/index.html',
   'ko/index.html',
   'ko/txt-srt-변환기/index.html',
+  'ko/srt-vtt-변환기/index.html',
   'ja/srt-txt-変換/index.html',
   'ja/txt-srt-変換/index.html',
+  'ja/srt-vtt-変換/index.html',
   'de/index.html',
   'de/txt-in-srt-umwandeln/index.html',
+  'de/srt-in-vtt-umwandeln/index.html',
 ];
 
 for (const relPath of samplePages) {
@@ -128,6 +134,25 @@ for (const relPath of samplePages) {
     }
     if (!html.includes('id="btn-convert"')) {
       errors.push(`${relPath} missing Convert to SRT button (id="btn-convert")`);
+    }
+  }
+
+  // Check srt-to-vtt specific tool inputs
+  if (relPath.includes('srt-to-vtt') || relPath.includes('convertisseur-srt-en-vtt') || relPath.includes('محول-srt-إلى-vtt') || relPath.includes('srt-vtt-변환기') || relPath.includes('srt-in-vtt-umwandeln') || relPath.includes('srt-vtt-変換')) {
+    if (!html.includes('id="srt-paste-input"')) {
+      errors.push(`${relPath} missing primary SRT paste textarea (id="srt-paste-input")`);
+    }
+    if (!html.includes('id="vtt-live-preview"')) {
+      errors.push(`${relPath} missing live preview textarea (id="vtt-live-preview")`);
+    }
+    if (!html.includes('id="btn-sample"')) {
+      errors.push(`${relPath} missing Try Sample button (id="btn-sample")`);
+    }
+    if (!html.includes('id="btn-convert"')) {
+      errors.push(`${relPath} missing Convert to VTT button (id="btn-convert")`);
+    }
+    if (!html.includes('id="dropzone"')) {
+      errors.push(`${relPath} missing secondary upload dropzone (id="dropzone")`);
     }
   }
 

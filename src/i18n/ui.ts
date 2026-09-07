@@ -5,6 +5,7 @@ export interface UiTranslations {
   tagline: string;
   skipToContent: string;
   nav: {
+    home: string;
     tools: string;
     about: string;
     privacy: string;
@@ -58,6 +59,7 @@ export const UI_STRINGS: Record<Locale, UiTranslations> = {
     tagline: 'Fast, client-side subtitle and SRT conversion tools.',
     skipToContent: 'Skip to content',
     nav: {
+      home: 'Home',
       tools: 'Tools',
       about: 'About',
       privacy: 'Privacy',
@@ -102,6 +104,7 @@ export const UI_STRINGS: Record<Locale, UiTranslations> = {
     tagline: 'Ferramentas rápidas e locais para conversão de legendas SRT.',
     skipToContent: 'Ir para o conteúdo',
     nav: {
+      home: 'Início',
       tools: 'Ferramentas',
       about: 'Sobre',
       privacy: 'Privacidade',
@@ -146,6 +149,7 @@ export const UI_STRINGS: Record<Locale, UiTranslations> = {
     tagline: 'Herramientas rápidas y seguras para convertir subtítulos SRT.',
     skipToContent: 'Saltar al contenido',
     nav: {
+      home: 'Inicio',
       tools: 'Herramientas',
       about: 'Acerca de',
       privacy: 'Privacidad',
@@ -190,6 +194,7 @@ export const UI_STRINGS: Record<Locale, UiTranslations> = {
     tagline: '빠르고 안전한 브라우저 기반 SRT 자막 변환 도구.',
     skipToContent: '본문 바로가기',
     nav: {
+      home: '홈',
       tools: '도구',
       about: '소개',
       privacy: '개인정보처리방침',
@@ -234,6 +239,7 @@ export const UI_STRINGS: Record<Locale, UiTranslations> = {
     tagline: 'Công cụ chuyển đổi phụ đề SRT nhanh chóng, an toàn ngay trên trình duyệt.',
     skipToContent: 'Chuyển đến nội dung chính',
     nav: {
+      home: 'Trang chủ',
       tools: 'Công cụ',
       about: 'Giới thiệu',
       privacy: 'Bảo mật',
@@ -278,6 +284,7 @@ export const UI_STRINGS: Record<Locale, UiTranslations> = {
     tagline: 'Alat konversi subtitle SRT yang cepat, aman, dan langsung di browser.',
     skipToContent: 'Lompat ke konten',
     nav: {
+      home: 'Beranda',
       tools: 'Alat',
       about: 'Tentang',
       privacy: 'Privasi',
@@ -322,6 +329,7 @@ export const UI_STRINGS: Record<Locale, UiTranslations> = {
     tagline: 'ブラウザ上で安全かつ高速に動作するSRT字幕変換ツール。',
     skipToContent: 'コンテンツへスキップ',
     nav: {
+      home: 'ホーム',
       tools: 'ツール',
       about: '概要',
       privacy: 'プライバシー',
@@ -366,6 +374,7 @@ export const UI_STRINGS: Record<Locale, UiTranslations> = {
     tagline: 'Outils rapides et sécurisés de conversion de sous-titres SRT dans le navigateur.',
     skipToContent: 'Passer au contenu',
     nav: {
+      home: 'Accueil',
       tools: 'Outils',
       about: 'À propos',
       privacy: 'Confidentialité',
@@ -410,6 +419,7 @@ export const UI_STRINGS: Record<Locale, UiTranslations> = {
     tagline: 'Schnelle, lokale Konvertierungswerkzeuge für SRT-Untertitel direkt im Browser.',
     skipToContent: 'Zum Inhalt springen',
     nav: {
+      home: 'Startseite',
       tools: 'Werkzeuge',
       about: 'Über uns',
       privacy: 'Datenschutz',
@@ -454,6 +464,7 @@ export const UI_STRINGS: Record<Locale, UiTranslations> = {
     tagline: 'أدوات سريعة وآمنة لتحويل ملفات الترجمة SRT محلياً في متصفحك.',
     skipToContent: 'الانتقال إلى المحتوى الرئيسي',
     nav: {
+      home: 'الرئيسية',
       tools: 'الأدوات',
       about: 'حول الموقع',
       privacy: 'الخصوصية',

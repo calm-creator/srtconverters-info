@@ -162,15 +162,30 @@ for (const relPath of samplePages) {
   }
 }
 
-// 2. Check CSS files for overflow hazards
-const cssFiles = fs.readdirSync(path.join(distDir, '_astro')).filter(f => f.endsWith('.css'));
-console.log(`Audited ${cssFiles.length} CSS bundles in dist/_astro/`);
+// 2. Check CSS for overflow hazards (either external bundles or inlined styles)
+const astroDir = path.join(distDir, '_astro');
+let verifiedOverflow = false;
 
-for (const cssFile of cssFiles) {
-  const cssContent = fs.readFileSync(path.join(distDir, '_astro', cssFile), 'utf8');
-  // Check for body overflow-x hidden
-  if (cssContent.includes('overflow-x:hidden')) {
-    console.log(`✓ Verified overflow-x: hidden in ${cssFile}`);
+if (fs.existsSync(astroDir)) {
+  const cssFiles = fs.readdirSync(astroDir).filter(f => f.endsWith('.css'));
+  if (cssFiles.length > 0) {
+    console.log(`Audited ${cssFiles.length} CSS bundles in dist/_astro/`);
+    for (const cssFile of cssFiles) {
+      const cssContent = fs.readFileSync(path.join(astroDir, cssFile), 'utf8');
+      if (cssContent.includes('overflow-x:hidden')) {
+        console.log(`✓ Verified overflow-x: hidden in ${cssFile}`);
+        verifiedOverflow = true;
+      }
+    }
+  }
+}
+
+if (!verifiedOverflow) {
+  // Styles are inlined directly into HTML
+  const sampleHtml = fs.readFileSync(path.join(distDir, 'index.html'), 'utf8');
+  if (sampleHtml.includes('overflow-x:hidden') || sampleHtml.includes('overflow-x: hidden')) {
+    console.log('✓ Verified overflow-x: hidden in inlined HTML styles');
+    verifiedOverflow = true;
   }
 }
 

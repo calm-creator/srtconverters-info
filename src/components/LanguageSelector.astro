@@ -70,6 +70,7 @@ const links = getLanguageSwitcherLinks(pageType === 'tool' ? 'tool' : 'page', pa
   aria-modal="true"
   aria-label={label}
   aria-hidden="true"
+  inert
 >
   <div class="mobile-lang-header">
     <div class="mobile-lang-title-group">
@@ -255,12 +256,16 @@ const links = getLanguageSwitcherLinks(pageType === 'tool' ? 'tool' : 'page', pa
     flex-direction: column;
     max-height: 80vh;
     transform: translateY(100%);
-    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.25s ease;
     overflow: hidden;
+    visibility: hidden;
+    pointer-events: none;
   }
 
   .mobile-lang-dialog.is-open {
     display: flex;
+    visibility: visible;
+    pointer-events: auto;
     transform: translateY(0);
   }
 
@@ -415,9 +420,10 @@ const links = getLanguageSwitcherLinks(pageType === 'tool' ? 'tool' : 'page', pa
       trigger.setAttribute('aria-expanded', 'true');
       trigger.setAttribute('aria-label', 'Close language selector');
       dialog.classList.add('is-open');
-      dialog.setAttribute('aria-hidden', 'false');
+      dialog.removeAttribute('aria-hidden');
+      dialog.removeAttribute('inert');
       backdrop.classList.add('is-active');
-      backdrop.setAttribute('aria-hidden', 'false');
+      backdrop.removeAttribute('aria-hidden');
       document.body.classList.add('lang-dialog-open');
       if (closeBtn) closeBtn.focus();
     }
@@ -427,6 +433,7 @@ const links = getLanguageSwitcherLinks(pageType === 'tool' ? 'tool' : 'page', pa
       trigger.setAttribute('aria-label', trigger.dataset.label || 'Select language');
       dialog.classList.remove('is-open');
       dialog.setAttribute('aria-hidden', 'true');
+      dialog.setAttribute('inert', '');
       backdrop.classList.remove('is-active');
       backdrop.setAttribute('aria-hidden', 'true');
       document.body.classList.remove('lang-dialog-open');
